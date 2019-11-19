@@ -1,0 +1,19 @@
+name: HamsterAPI
+version: ${project.version}
+main: cn.hamster3.api.HamsterAPI
+prefix: HamsterAPI
+load: STARTUP
+softdepend:
+  - Vault
+  - PlayerPoints
+authors: [Viosin]
+description: 一个方便开发者使用的API
+commands:
+  HamsterAPI:
+    aliases: [hapi]
+    description: HamsterAPI主要命令
+    permission: hapi.use
+    permission-message: §c您没有这个权限
+permissions:
+  hapi.use:
+    default: op

@@ -1,0 +1,10 @@
+debug: false
+messages:
+  ==: DisplayMessage
+  sound: ENDERDRAGON_GROWL
+  volume: 1
+  pitch: 1
+  message: "&a测试消息"
+  actionBar: "&a测试消息"
+  title: "&a测试消息"
+  subTitle: "&a测试消息"
