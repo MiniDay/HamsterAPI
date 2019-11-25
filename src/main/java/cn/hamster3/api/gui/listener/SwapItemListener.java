@@ -44,9 +44,9 @@ public class SwapItemListener implements Listener {
             return;
         }
 
-        cursor = cursor == null ? null : cursor.clone();
+        cursor = HamsterAPI.isEmptyItemStack(cursor) ? null : cursor.clone();
 
-        inventory.setItem(rawSlot, cursor == null ? guiItem : cursor);
+        inventory.setItem(rawSlot, HamsterAPI.isEmptyItemStack(cursor) ? guiItem : cursor);
         event.setCursor(handler.getItem(rawSlot));
         handler.setItem(rawSlot, cursor);
     }
