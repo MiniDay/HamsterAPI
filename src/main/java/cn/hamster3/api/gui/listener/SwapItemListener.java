@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class SwapItemListener implements Listener {
     private Class<? extends Handler> handlerClass;
@@ -44,9 +45,17 @@ public class SwapItemListener implements Listener {
             return;
         }
 
-        cursor = HamsterAPI.isEmptyItemStack(cursor) ? null : cursor.clone();
+        ItemStack putItem;
+        if (HamsterAPI.isEmptyItemStack(cursor)) {
+            putItem = guiItem;
+        } else {
+            putItem = cursor.clone();
+            ItemMeta meta = putItem.getItemMeta();
+            meta.setDisplayName(meta.getDisplayName() + " ");
+            putItem.setItemMeta(meta);
+        }
 
-        inventory.setItem(rawSlot, HamsterAPI.isEmptyItemStack(cursor) ? guiItem : cursor);
+        inventory.setItem(rawSlot, cursor == null ? guiItem : putItem);
         event.setCursor(handler.getItem(rawSlot));
         handler.setItem(rawSlot, cursor);
     }
