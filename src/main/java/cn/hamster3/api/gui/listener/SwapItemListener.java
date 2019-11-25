@@ -19,7 +19,7 @@ public class SwapItemListener implements Listener {
         this.handlerClass = handler;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     @Deprecated
     public void putItem(InventoryClickEvent event) {
         int rawSlot = event.getRawSlot();
@@ -51,7 +51,7 @@ public class SwapItemListener implements Listener {
         handler.setItem(rawSlot, cursor);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void returnItem(InventoryCloseEvent event) {
         Inventory inventory = event.getInventory();
         InventoryHolder holder = inventory.getHolder();
