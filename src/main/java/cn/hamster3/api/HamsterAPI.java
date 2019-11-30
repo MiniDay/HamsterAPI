@@ -683,6 +683,9 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     public static void giveItem(HumanEntity player, ItemStack stack) {
+        if (isEmptyItemStack(stack)) {
+            return;
+        }
         World world = player.getWorld();
         for (ItemStack dropItem : player.getInventory().addItem(stack).values()) {
             world.dropItem(player.getLocation(), dropItem);
