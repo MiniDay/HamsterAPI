@@ -1,10 +1,11 @@
 package cn.hamster3.api;
 
+import cn.hamster3.api.calculator.Calculator;
 import cn.hamster3.api.command.CommandExecutor;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
-import cn.hamster3.util.calculator.Calculator;
 import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -12,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -31,6 +33,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public final class HamsterAPI extends JavaPlugin {
@@ -67,6 +73,16 @@ public final class HamsterAPI extends JavaPlugin {
      * 发送一条控制台消息
      *
      * @param message 要发送的消息
+     * @param objects format参数
+     */
+    public static void sendConsoleMessage(@NotNull final String message, Object... objects) {
+        Bukkit.getConsoleSender().sendMessage(String.format(message, objects));
+    }
+
+    /**
+     * 发送一条控制台消息
+     *
+     * @param message 要发送的消息
      */
     public static void sendConsoleMessage(@NotNull final String[] message) {
         Bukkit.getConsoleSender().sendMessage(message);
@@ -97,15 +113,13 @@ public final class HamsterAPI extends JavaPlugin {
     /**
      * 自动替换颜色代码
      *
-     * @param strings 要替换的字符串
+     * @param string  要替换的字符串
+     * @param objects format参数
      * @return 替换后的字符串
      */
-    public static String[] replaceColorCode(final String[] strings) {
-        if (strings == null) return null;
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = replaceColorCode(strings[i]);
-        }
-        return strings;
+    public static String replaceColorCode(final String string, Object... objects) {
+        if (string == null) return null;
+        return String.format(string, objects).replace("&", "§");
     }
 
     /**
@@ -114,12 +128,13 @@ public final class HamsterAPI extends JavaPlugin {
      * @param strings 要替换的字符串
      * @return 替换后的字符串
      */
-    public static List<String> replaceColorCode(final List<String> strings) {
+    public static ArrayList<String> replaceColorCode(final Collection<String> strings) {
         if (strings == null) return null;
-        for (int i = 0; i < strings.size(); i++) {
-            strings.set(i, replaceColorCode(strings.get(i)));
+        ArrayList<String> list = new ArrayList<>();
+        for (String s : strings) {
+            list.add(replaceColorCode(s));
         }
-        return strings;
+        return list;
     }
 
     /**
@@ -143,6 +158,7 @@ public final class HamsterAPI extends JavaPlugin {
 
     /**
      * 快捷创建GUI
+     * 已弃用，现在建议使用Gui类
      *
      * @param owner   箱子的主人，可以设为null
      * @param title   箱子的标题
@@ -150,6 +166,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param fills   填充的图形
      * @return 创建后的GUI
      */
+    @Deprecated
     public static Inventory getInventory(final InventoryHolder owner, final String title, @NotNull final Swapper swapper, @NotNull List<String> fills) {
         List<String> graphics = new ArrayList<>();
         //如果填充图形的字符串长度超过6，则截取前面6个String
@@ -383,7 +400,7 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 返回Economy实例
+     * 返回Vault前置的Economy实例
      *
      * @return Economy实例
      */
@@ -558,15 +575,18 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 过滤字符串列表
+     * 过滤字符串集合
+     * 将原集合中所有以start开头的字符串取出形成一个新的集合并返回
      *
      * @param strings 要过滤的字符串
-     * @param start   过滤的关键字
-     * @return 原字符串列表中只以关键字起始的字符串列表
+     * @param start   关键字
+     * @return 过滤后的字符串
      */
-    public static List<String> startWith(List<String> strings, String start) {
-        if (start == null || start.length() == 0) return strings;
+    public static ArrayList<String> startWith(Collection<String> strings, String start) {
         ArrayList<String> list = new ArrayList<>();
+        if (strings == null || start == null) {
+            return list;
+        }
         for (String s : strings) {
             if (s.startsWith(start)) {
                 list.add(s);
@@ -577,6 +597,8 @@ public final class HamsterAPI extends JavaPlugin {
 
     /**
      * 获取玩家的头颅
+     * 在1.11以上的服务端中获取头颅材质是在服务器上运行的
+     * 因此建议使用异步线程调用该方法
      *
      * @param uuid 要获取的玩家
      * @return 玩家的头颅物品
@@ -588,6 +610,8 @@ public final class HamsterAPI extends JavaPlugin {
 
     /**
      * 获取玩家的头颅
+     * 在1.11以上的服务端中获取头颅材质是在服务器上运行的
+     * 因此建议使用异步线程调用该方法
      *
      * @param name 要获取的玩家
      * @return 玩家的头颅物品
@@ -665,10 +689,28 @@ public final class HamsterAPI extends JavaPlugin {
         return uuidList;
     }
 
+    /**
+     * 判断物品是否为空
+     * 当对象为null时返回true
+     * 当物品的Material为AIR时返回true
+     * 当物品的数量小于1时返回true
+     *
+     * @param stack 物品
+     * @return 是否为空
+     */
     public static boolean isEmptyItemStack(ItemStack stack) {
-        return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0;
+        return stack == null || stack.getType() == Material.AIR || stack.getAmount() < 1;
     }
 
+    /**
+     * 获取物品的名称
+     * 当物品为null时返回"null"
+     * 当物品拥有DisplayName时返回DisplayName
+     * 否则返回物品的Material的name
+     *
+     * @param stack 物品
+     * @return 物品的名称
+     */
     public static String getItemName(ItemStack stack) {
         if (stack == null) {
             return "null";
@@ -682,6 +724,13 @@ public final class HamsterAPI extends JavaPlugin {
         return stack.getType().name();
     }
 
+    /**
+     * 给予玩家一个物品, 当玩家背包满时
+     * 将会在玩家附近生成这个物品的掉落物
+     *
+     * @param player 玩家
+     * @param stack  物品
+     */
     public static void giveItem(HumanEntity player, ItemStack stack) {
         if (isEmptyItemStack(stack)) {
             return;
@@ -692,6 +741,14 @@ public final class HamsterAPI extends JavaPlugin {
         }
     }
 
+    /**
+     * 在服务器的全部世界上寻找实体
+     * 在1.9以上可以调用Bukkit.getEntity()实现同样的功能
+     *
+     * @param uuid 实体的uuid
+     * @return 实体
+     */
+    @Nullable
     public static Entity getEntity(UUID uuid) {
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
@@ -701,6 +758,68 @@ public final class HamsterAPI extends JavaPlugin {
             }
         }
         return null;
+    }
+
+    /**
+     * 创建SQL连接
+     *
+     * @param host     主机地址
+     * @param port     主机端口
+     * @param user     用户名
+     * @param password 密码
+     * @return 连接对象
+     * @throws SQLException SQL连接异常
+     */
+    public static Connection getMySQLConnection(String host, String port, String user, String password) throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ignored) {
+        }
+        return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true", user, password);
+    }
+
+    /**
+     * 创建SQL连接
+     *
+     * @param host     主机地址
+     * @param port     主机端口
+     * @param user     用户名
+     * @param password 密码
+     * @param database 要使用的数据库
+     * @return 连接对象
+     * @throws SQLException SQL连接异常
+     */
+    public static Connection getMySQLConnection(String host, String port, String user, String password, String database) throws SQLException {
+        Connection connection = getMySQLConnection(host, port, user, password);
+
+        Statement statement = connection.createStatement();
+        statement.execute("CREATE DATABASE IF NOT EXISTS " + database + ";");
+        statement.execute("USE " + database + ";");
+        statement.close();
+        return connection;
+    }
+
+    /**
+     * 创建SQL连接
+     *
+     * @param config config对象
+     * @return 连接对象
+     * @throws SQLException SQL连接异常
+     */
+    public static Connection getMySQLConnection(ConfigurationSection config) throws SQLException {
+        Connection connection = getMySQLConnection(
+                config.getString("host"),
+                config.getString("port"),
+                config.getString("user"),
+                config.getString("password"));
+        if (config.contains("database")) {
+            String database = config.getString("database");
+            Statement statement = connection.createStatement();
+            statement.execute("CREATE DATABASE IF NOT EXISTS " + database + ";");
+            statement.execute("USE " + database + ";");
+            statement.close();
+        }
+        return connection;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cn.hamster3.api.gui.handler;
 
 import cn.hamster3.api.gui.Gui;
+import com.sun.istack.internal.Nullable;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,8 @@ public abstract class Handler implements InventoryHolder {
      * 成功向GUI中放入一个物品时会由SwapItemListener调用这个事件
      * 请先确保你已经注册了SwapItemListener监听器
      * 该对象中存储的ItemStack是从Inventory中clone的复制品
-     * 因此可以直接修改Inventory中的物品
+     * 与Inventory中的物品没有任何关联
+     * 因此可以直接修改Inventory中的物品而不会影响到getItem()获取的物品
      *
      * @param index 放入的槽位
      * @param stack 放入的物品
@@ -45,15 +47,30 @@ public abstract class Handler implements InventoryHolder {
         }
     }
 
+    /**
+     * 获取handler内某个位置上的物品
+     *
+     * @param index 索引
+     * @return 物品
+     */
+    @Nullable
     public ItemStack getItem(int index) {
         return placedItem.get(index);
     }
 
+    /**
+     * 从handler中取走某个位置上的一个物品
+     * 如果物品数量大于1，则物品数量-1
+     * 否则将物品置为null
+     * 这个操作将会更新视图中的显示物品
+     *
+     * @param index 物品索引
+     */
     public void takeItem(int index) {
         ItemStack stack = getItem(index);
         if (stack != null) {
             int amount = stack.getAmount();
-            if (amount <=  1) {
+            if (amount <= 1) {
                 stack = null;
             } else {
                 stack.setAmount(amount - 1);
@@ -67,6 +84,11 @@ public abstract class Handler implements InventoryHolder {
         }
     }
 
+    /**
+     * 返回这个handler所使用的的gui
+     *
+     * @return gui
+     */
     public Gui getGui() {
         return gui;
     }
@@ -76,6 +98,11 @@ public abstract class Handler implements InventoryHolder {
         return inventory;
     }
 
+    /**
+     * 获取所有被setItem放置的物品
+     *
+     * @return 所有物品
+     */
     public Collection<ItemStack> getPlacedItem() {
         return placedItem.values();
     }

@@ -15,6 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 一个GUI对象
+ * <p>
+ * 建议通过ConfigurationSection来实例化这个对象
+ * <p>
+ * 详细格式请参考TestGUI.yml
+ */
 public class Gui implements InventoryHolder {
     protected HashMap<String, ItemStack> buttonType;
     protected HashMap<String, Integer> buttonIndex;

@@ -13,6 +13,19 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+/**
+ * 一个用于交换inventory物品的监听器
+ * <p>
+ * 你可以用自己的监听器继承这个类
+ * <p>
+ * 我们会自动找到对应的handler
+ * <p>
+ * 并通过canPutItem()判断是否允许在某个位置放置某个物品
+ * <p>
+ * 若允许，则自动将该物品复制一份放入Handler中，并更新inventory视图
+ * <p>
+ * 若不允许，则取消事件
+ */
 public class SwapItemListener implements Listener {
     private Class<? extends Handler> handlerClass;
 
