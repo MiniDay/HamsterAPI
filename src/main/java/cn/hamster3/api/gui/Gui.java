@@ -22,6 +22,8 @@ import java.util.Map;
  * <p>
  * 详细格式请参考TestGUI.yml
  */
+
+@SuppressWarnings("all")
 public class Gui implements InventoryHolder {
     protected HashMap<String, ItemStack> buttonType;
     protected HashMap<String, Integer> buttonIndex;
@@ -30,24 +32,6 @@ public class Gui implements InventoryHolder {
     private Swapper swapper;
     private int size;
     private Inventory inventory;
-
-    public Gui(@NotNull String title, @NotNull List<String> graphic, @NotNull Swapper swapper) {
-        if (graphic.size() == 0) {
-            throw new IllegalArgumentException("graphic size can not be less than 1");
-        }
-        this.title = title;
-        this.graphic = graphic;
-        this.swapper = swapper;
-        size = graphic.size();
-        if (size > 6) size = 6;
-        inventory = Bukkit.createInventory(this, size * 9, title);
-        for (int i = 0; i < graphic.size(); i++) {
-            String s = graphic.get(i);
-            for (int j = 0; j < s.length() && j < 9; j++) {
-                inventory.setItem(i * 9 + j, swapper.getItemStackByChar(graphic.get(i).charAt(j)));
-            }
-        }
-    }
 
     public Gui(@NotNull ConfigurationSection config) {
         this(HamsterAPI.replaceColorCode(config.getString("title")),
@@ -66,6 +50,24 @@ public class Gui implements InventoryHolder {
             ConfigurationSection buttonTypeConfig = config.getConfigurationSection("buttonType");
             for (String key : buttonTypeConfig.getKeys(false)) {
                 buttonType.put(key, getSwapper().getItemStackByChar(buttonTypeConfig.getString(key).charAt(0)));
+            }
+        }
+    }
+
+    public Gui(@NotNull String title, @NotNull List<String> graphic, @NotNull Swapper swapper) {
+        if (graphic.size() == 0) {
+            throw new IllegalArgumentException("graphic size can not be less than 1");
+        }
+        this.title = title;
+        this.graphic = graphic;
+        this.swapper = swapper;
+        size = graphic.size();
+        if (size > 6) size = 6;
+        inventory = Bukkit.createInventory(this, size * 9, title);
+        for (int i = 0; i < graphic.size(); i++) {
+            String s = graphic.get(i);
+            for (int j = 0; j < s.length() && j < 9; j++) {
+                inventory.setItem(i * 9 + j, swapper.getItemStackByChar(graphic.get(i).charAt(j)));
             }
         }
     }

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("all")
 @SerializableAs("DisplayMessage")
 public class DisplayMessage implements ConfigurationSerializable {
     private String message;

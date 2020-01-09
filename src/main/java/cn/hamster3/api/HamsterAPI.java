@@ -5,7 +5,6 @@ import cn.hamster3.api.command.CommandExecutor;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -39,6 +38,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+@SuppressWarnings("unused")
 public final class HamsterAPI extends JavaPlugin {
     private static HamsterAPI instance;
     private static Economy economy;
@@ -93,7 +93,7 @@ public final class HamsterAPI extends JavaPlugin {
      *
      * @param message 要发送的消息
      */
-    public static void sendConsoleMessage(@NotNull final List<String> message) {
+    public static void sendConsoleMessage(@NotNull final Collection<String> message) {
         for (String string : message) {
             Bukkit.getConsoleSender().sendMessage(string);
         }
@@ -139,6 +139,7 @@ public final class HamsterAPI extends JavaPlugin {
 
     /**
      * 快捷创建GUI
+     * 现在推荐使用cn.hamster3.api.gui.Gui类
      *
      * @param owner   箱子的主人，可以设为null
      * @param title   箱子的标题
@@ -146,6 +147,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param fills   填充的图形
      * @return 创建后的GUI
      */
+    @Deprecated
     public static Inventory getInventory(final InventoryHolder owner, final String title, @NotNull final Swapper swapper, @NotNull String... fills) {
         //如果填充图形的字符串长度超过6，则截取前面6个String
         if (fills.length > 6) {
@@ -185,6 +187,43 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
+     * 使用对应的图形和swapper填充GUI
+     *
+     * @param inventory 要填充的GUI
+     * @param swapper   Item交换器
+     * @param graphics  GUI图形
+     */
+    public static void fillInventory(@NotNull final Inventory inventory, @NotNull final Swapper swapper, @NotNull final List<String> graphics) {
+        HashMap<Character, ItemStack> map = new HashMap<>();
+        for (String s : graphics) {
+            for (int j = 0; j < s.length(); j++) {
+                final char c = s.charAt(j);
+                if (!map.containsKey(c)) {
+                    map.put(c, swapper.getItemStackByChar(c));
+                }
+                if (j == 9) break;
+            }
+        }
+        for (int i = 0; i < graphics.size(); i++) {
+            for (int j = 0; j < graphics.get(i).length(); j++) {
+                if (j == 9) break;
+                inventory.setItem(i * 9 + j, map.get(graphics.get(i).charAt(j)));
+            }
+        }
+    }
+
+    /**
+     * 使用对应的图形和swapper填充GUI
+     *
+     * @param inventory 要填充的GUI
+     * @param swapper   Item交换器
+     * @param graphics  GUI图形
+     */
+    public static void fillInventory(Inventory inventory, Swapper swapper, String[] graphics) {
+        fillInventory(inventory, swapper, Arrays.asList(graphics));
+    }
+
+    /**
      * 创建一个每日运行的线程
      * 该线程会在每天的0点运行一次
      *
@@ -194,11 +233,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name           线程的名字
      * @return 是否成功创建线程
      */
-    public static boolean addDailyRunnable(Runnable runnable, boolean asynchronously, Plugin plugin, String name) {
-        if (runnable == null) return false;
-        if (plugin == null || !plugin.isEnabled()) return false;
-        if (name == null) return false;
-        if (!plugin.isEnabled()) return false;
+    public static boolean addDailyRunnable(@NotNull Runnable runnable, @NotNull boolean asynchronously, @NotNull Plugin plugin, @NotNull String name) {
         DailyRunnable dailyRunnable = new DailyRunnable(plugin, name, runnable);
         if (asynchronously) asynchronouslyDaily.add(dailyRunnable);
         else daily.add(dailyRunnable);
@@ -211,7 +246,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name 线程的名字
      * @return 是否成功取消
      */
-    public static boolean cancelDailyRunnable(String name) {
+    public static boolean cancelDailyRunnable(@NotNull String name) {
         boolean flag = false;
         for (DailyRunnable runnable : new ArrayList<>(daily)) {
             if (runnable.getName().equals(name)) {
@@ -234,7 +269,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param plugin 插件实例
      * @return 是否成功取消
      */
-    public static boolean cancelDailyRunnable(Plugin plugin) {
+    public static boolean cancelDailyRunnable(@NotNull Plugin plugin) {
         boolean flag = false;
         for (DailyRunnable runnable : new ArrayList<>(daily)) {
             if (runnable.getPlugin().equals(plugin)) {
@@ -409,49 +444,12 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 使用对应的图形和swapper填充GUI
-     *
-     * @param inventory 要填充的GUI
-     * @param swapper   Item交换器
-     * @param graphics  GUI图形
-     */
-    public static void fillInventory(Inventory inventory, Swapper swapper, List<String> graphics) {
-        HashMap<Character, ItemStack> map = new HashMap<>();
-        for (String s : graphics) {
-            for (int j = 0; j < s.length(); j++) {
-                final char c = s.charAt(j);
-                if (!map.containsKey(c)) {
-                    map.put(c, swapper.getItemStackByChar(c));
-                }
-                if (j == 9) break;
-            }
-        }
-        for (int i = 0; i < graphics.size(); i++) {
-            for (int j = 0; j < graphics.get(i).length(); j++) {
-                if (j == 9) break;
-                inventory.setItem(i * 9 + j, map.get(graphics.get(i).charAt(j)));
-            }
-        }
-    }
-
-    /**
-     * 使用对应的图形和swapper填充GUI
-     *
-     * @param inventory 要填充的GUI
-     * @param swapper   Item交换器
-     * @param graphics  GUI图形
-     */
-    public static void fillInventory(Inventory inventory, Swapper swapper, String[] graphics) {
-        fillInventory(inventory, swapper, Arrays.asList(graphics));
-    }
-
-    /**
      * 将玩家传送到另一个服务器（指BC链接模式下
      *
      * @param player   玩家
      * @param serverID 服务器名称
      */
-    public static void sendPlayerToBCServer(Player player, String serverID) {
+    public static void sendPlayerToBCServer(@NotNull Player player, @NotNull String serverID) {
         final ByteArrayOutputStream b = new ByteArrayOutputStream();
         final DataOutputStream out = new DataOutputStream(b);
         try {
@@ -470,7 +468,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player  要发送的玩家
      * @param message 要显示的消息
      */
-    public static void sendActionBar(Player player, String message) {
+    public static void sendActionBar(@NotNull Player player, @NotNull String message) {
         if (!player.isOnline()) {
             return;
         }
@@ -567,7 +565,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player  玩家
      * @param command 要执行的命令
      */
-    public static void usePlayerCommandBypassPermission(Player player, String command) {
+    public static void opCommand(Player player, String command) {
         boolean isOp = player.isOp();
         player.setOp(true);
         Bukkit.dispatchCommand(player, command);
@@ -748,7 +746,6 @@ public final class HamsterAPI extends JavaPlugin {
      * @param uuid 实体的uuid
      * @return 实体
      */
-    @Nullable
     public static Entity getEntity(UUID uuid) {
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {

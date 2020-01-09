@@ -8,13 +8,14 @@ import java.util.Stack;
  * 传入算数表达式，将返回一个浮点值结果
  * 如果计算过程错误，将返回一个NaN
  */
+
 public class Calculator {
     // 默认除法运算精度
     private static final int DEF_DIV_SCALE = 16;
 
     private Stack<String> postfixStack = new Stack<>();// 后缀式栈
     private Stack<Character> opStack = new Stack<>();// 运算符栈
-    private int[] operatPriority = new int[]{0, 3, 2, 1, -1, 1, 0, 2};// 运用运算符ASCII码-40做索引的运算符优先级
+    private int[] operaPriority = new int[]{0, 3, 2, 1, -1, 1, 0, 2};// 运用运算符ASCII码-40做索引的运算符优先级
 
     /**
      * 按照给定的表达式计算
@@ -44,7 +45,7 @@ public class Calculator {
                 resultStack.push(tempResult);
             }
         }
-        return Double.valueOf(resultStack.pop());
+        return Double.parseDouble(resultStack.pop());
     }
 
     /**
@@ -111,7 +112,7 @@ public class Calculator {
      */
     private boolean compare(char cur, char peek) {
         boolean result = false;
-        if (operatPriority[(peek) - 40] >= operatPriority[(cur) - 40]) {
+        if (operaPriority[(peek) - 40] >= operaPriority[(cur) - 40]) {
             result = true;
         }
         return result;
