@@ -790,8 +790,8 @@ public final class HamsterAPI extends JavaPlugin {
         Connection connection = getMySQLConnection(host, port, user, password);
 
         Statement statement = connection.createStatement();
-        statement.execute("CREATE DATABASE IF NOT EXISTS " + database + ";");
-        statement.execute("USE " + database + ";");
+        statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
+        statement.execute(String.format("USE %s;", database));
         statement.close();
         return connection;
     }
@@ -812,8 +812,8 @@ public final class HamsterAPI extends JavaPlugin {
         if (config.contains("database")) {
             String database = config.getString("database");
             Statement statement = connection.createStatement();
-            statement.execute("CREATE DATABASE IF NOT EXISTS " + database + ";");
-            statement.execute("USE " + database + ";");
+            statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
+            statement.execute(String.format("USE %s;", database));
             statement.close();
         }
         return connection;
