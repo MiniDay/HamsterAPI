@@ -64,11 +64,11 @@ public class SwapItemListener implements Listener {
         } else {
             putItem = cursor.clone();
             ItemMeta meta = putItem.getItemMeta();
-            meta.setDisplayName(meta.getDisplayName() + " ");
+            meta.setDisplayName(HamsterAPI.getItemName(putItem) + " ");
             putItem.setItemMeta(meta);
         }
 
-        inventory.setItem(rawSlot, cursor == null ? guiItem : putItem);
+        inventory.setItem(rawSlot, putItem);
         event.setCursor(handler.getItem(rawSlot));
         handler.setItem(rawSlot, cursor);
     }

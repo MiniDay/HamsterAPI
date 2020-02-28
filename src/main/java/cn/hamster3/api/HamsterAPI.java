@@ -1,7 +1,7 @@
 package cn.hamster3.api;
 
 import cn.hamster3.api.calculator.Calculator;
-import cn.hamster3.api.command.CommandExecutor;
+import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import com.sun.istack.internal.NotNull;
@@ -824,22 +824,9 @@ public final class HamsterAPI extends JavaPlugin {
         instance = this;
         ConfigurationSerialization.registerClass(DisplayMessage.class);
         HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件正在初始化...");
-
-        if (!HamsterAPI.isSetupVault()) {
-            sendConsoleMessage("§e§l[HamsterAPI] §c未检测到Vault插件!");
-        } else {
-            sendConsoleMessage("§e§l[HamsterAPI] §a已连接Vault!");
-            RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-            if (economyProvider != null) {
-                economy = economyProvider.getProvider();
-                HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a经济系统挂接成功...");
-            } else {
-                HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到经济插件!");
-            }
-        }
         dailyThread = new DailyThread();
         dailyThread.start();
-        getCommand("HamsterAPI").setExecutor(new CommandExecutor(this));
+        getCommand("HamsterAPI").setExecutor(new HamsterCommand(this));
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         nmsServer = Bukkit.getServer().getClass().getPackage().getName();
@@ -849,6 +836,21 @@ public final class HamsterAPI extends JavaPlugin {
             useOldMethods = true;
         }
         HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件已启动!");
+
+        Bukkit.getScheduler().runTask(this, () -> {
+            if (!HamsterAPI.isSetupVault()) {
+                sendConsoleMessage("§e§l[HamsterAPI] §c未检测到Vault插件!");
+            } else {
+                sendConsoleMessage("§e§l[HamsterAPI] §a已连接Vault!");
+                RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+                if (economyProvider != null) {
+                    economy = economyProvider.getProvider();
+                    HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a经济系统挂接成功...");
+                } else {
+                    HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到经济插件!");
+                }
+            }
+        });
     }
 
     @Override
