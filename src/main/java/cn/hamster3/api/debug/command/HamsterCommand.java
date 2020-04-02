@@ -59,6 +59,22 @@ public class HamsterCommand implements TabExecutor {
             }
             sender.sendMessage("§a信息已保存至test.yml");
         }
+        if (args[0].equalsIgnoreCase("sleep")) {
+            long time;
+            try {
+                time = Long.parseLong(args[1]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("§c暂停时间必须是一个整数!");
+                return true;
+            }
+            sender.sendMessage("§a暂停主线程 " + time + " 毫秒!");
+            try {
+                Thread.sleep(time);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            sender.sendMessage("§a服务器主线程已恢复运行!");
+        }
         return true;
     }
 
@@ -71,6 +87,8 @@ public class HamsterCommand implements TabExecutor {
         sender.sendMessage("§e======================");
         sender.sendMessage("§a/hAPI yml");
         sender.sendMessage("§b保存测试信息到YAML文件中");
+        sender.sendMessage("§a/hAPI sleep <毫秒数>");
+        sender.sendMessage("§b暂停主线程n毫秒");
         sender.sendMessage("§e======================");
     }
 }
