@@ -4,7 +4,6 @@ import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import cn.hamster3.api.utils.calculator.Calculator;
-import com.sun.istack.internal.NotNull;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -65,7 +64,7 @@ public final class HamsterAPI extends JavaPlugin {
      *
      * @param message 要发送的消息
      */
-    public static void sendConsoleMessage(@NotNull final String message) {
+    public static void sendConsoleMessage(final String message) {
         Bukkit.getConsoleSender().sendMessage(message);
     }
 
@@ -75,7 +74,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param message 要发送的消息
      * @param objects format参数
      */
-    public static void sendConsoleMessage(@NotNull final String message, Object... objects) {
+    public static void sendConsoleMessage(final String message, Object... objects) {
         Bukkit.getConsoleSender().sendMessage(String.format(message, objects));
     }
 
@@ -84,7 +83,7 @@ public final class HamsterAPI extends JavaPlugin {
      *
      * @param message 要发送的消息
      */
-    public static void sendConsoleMessage(@NotNull final String[] message) {
+    public static void sendConsoleMessage(final String[] message) {
         Bukkit.getConsoleSender().sendMessage(message);
     }
 
@@ -93,7 +92,7 @@ public final class HamsterAPI extends JavaPlugin {
      *
      * @param message 要发送的消息
      */
-    public static void sendConsoleMessage(@NotNull final Collection<String> message) {
+    public static void sendConsoleMessage(final Collection<String> message) {
         for (String string : message) {
             Bukkit.getConsoleSender().sendMessage(string);
         }
@@ -148,7 +147,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @return 创建后的GUI
      */
     @Deprecated
-    public static Inventory getInventory(final InventoryHolder owner, final String title, @NotNull final Swapper swapper, @NotNull String... fills) {
+    public static Inventory getInventory(final InventoryHolder owner, final String title, final Swapper swapper, String... fills) {
         //如果填充图形的字符串长度超过6，则截取前面6个String
         if (fills.length > 6) {
             fills = Arrays.copyOf(fills, 6);
@@ -169,7 +168,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @return 创建后的GUI
      */
     @Deprecated
-    public static Inventory getInventory(final InventoryHolder owner, final String title, @NotNull final Swapper swapper, @NotNull List<String> fills) {
+    public static Inventory getInventory(final InventoryHolder owner, final String title, final Swapper swapper, List<String> fills) {
         List<String> graphics = new ArrayList<>();
         //如果填充图形的字符串长度超过6，则截取前面6个String
         if (fills.size() > 6) {
@@ -193,7 +192,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param swapper   Item交换器
      * @param graphics  GUI图形
      */
-    public static void fillInventory(@NotNull final Inventory inventory, @NotNull final Swapper swapper, @NotNull final List<String> graphics) {
+    public static void fillInventory(final Inventory inventory, final Swapper swapper, final List<String> graphics) {
         HashMap<Character, ItemStack> map = new HashMap<>();
         for (String s : graphics) {
             for (int j = 0; j < s.length(); j++) {
@@ -233,7 +232,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name           线程的名字
      * @return 是否成功创建线程
      */
-    public static boolean addDailyRunnable(@NotNull Runnable runnable, @NotNull boolean asynchronously, @NotNull Plugin plugin, @NotNull String name) {
+    public static boolean addDailyRunnable(Runnable runnable, boolean asynchronously, Plugin plugin, String name) {
         DailyRunnable dailyRunnable = new DailyRunnable(plugin, name, runnable);
         if (asynchronously) asynchronouslyDaily.add(dailyRunnable);
         else daily.add(dailyRunnable);
@@ -246,7 +245,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name 线程的名字
      * @return 是否成功取消
      */
-    public static boolean cancelDailyRunnable(@NotNull String name) {
+    public static boolean cancelDailyRunnable(String name) {
         boolean flag = false;
         for (DailyRunnable runnable : new ArrayList<>(daily)) {
             if (runnable.getName().equals(name)) {
@@ -269,7 +268,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param plugin 插件实例
      * @return 是否成功取消
      */
-    public static boolean cancelDailyRunnable(@NotNull Plugin plugin) {
+    public static boolean cancelDailyRunnable(Plugin plugin) {
         boolean flag = false;
         for (DailyRunnable runnable : new ArrayList<>(daily)) {
             if (runnable.getPlugin().equals(plugin)) {
@@ -389,7 +388,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player 玩家
      * @param money  钱的数量
      */
-    public static void giveMoney(@NotNull final OfflinePlayer player, @NotNull final double money) {
+    public static void giveMoney(final OfflinePlayer player, final double money) {
         if (isSetupEconomy()) {
             economy.depositPlayer(player, money);
         }
@@ -401,7 +400,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player 玩家
      * @param money  钱的数量
      */
-    public static void takeMoney(@NotNull final OfflinePlayer player, @NotNull final double money) {
+    public static void takeMoney(final OfflinePlayer player, final double money) {
         if (isSetupEconomy()) {
             economy.withdrawPlayer(player, money);
         }
@@ -413,7 +412,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player 玩家
      * @return 玩家的钱的数量（若没有安装经济插件则返回NaN
      */
-    public static double seeMoney(@NotNull final OfflinePlayer player) {
+    public static double seeMoney(final OfflinePlayer player) {
         if (!isSetupEconomy()) {
             return Double.NaN;
         }
@@ -427,7 +426,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param money  金钱的数量
      * @return 是否有足够的钱（若没有安装经济插件则返回false
      */
-    public static boolean hasMoney(@NotNull final OfflinePlayer player, @NotNull final double money) {
+    public static boolean hasMoney(final OfflinePlayer player, final double money) {
         if (!isSetupEconomy()) {
             return false;
         }
@@ -449,7 +448,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player   玩家
      * @param serverID 服务器名称
      */
-    public static void sendPlayerToBCServer(@NotNull Player player, @NotNull String serverID) {
+    public static void sendPlayerToBCServer(Player player, String serverID) {
         final ByteArrayOutputStream b = new ByteArrayOutputStream();
         final DataOutputStream out = new DataOutputStream(b);
         try {
@@ -468,7 +467,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param player  要发送的玩家
      * @param message 要显示的消息
      */
-    public static void sendActionBar(@NotNull Player player, @NotNull String message) {
+    public static void sendActionBar(Player player, String message) {
         if (!player.isOnline()) {
             return;
         }

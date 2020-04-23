@@ -1,7 +1,6 @@
 package cn.hamster3.api.gui.handler;
 
 import cn.hamster3.api.gui.Gui;
-import com.sun.istack.internal.Nullable;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collection;
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 public abstract class Handler implements InventoryHolder {
     private Gui gui;
     private Inventory inventory;
@@ -53,7 +53,6 @@ public abstract class Handler implements InventoryHolder {
      * @param index 索引
      * @return 物品
      */
-    @Nullable
     public ItemStack getItem(int index) {
         return placedItem.get(index);
     }

@@ -3,7 +3,6 @@ package cn.hamster3.api.gui;
 import cn.hamster3.api.HamsterAPI;
 import cn.hamster3.api.gui.swapper.MapSwapper;
 import cn.hamster3.api.gui.swapper.Swapper;
-import com.sun.istack.internal.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
@@ -33,7 +32,7 @@ public class Gui implements InventoryHolder {
     private int size;
     private Inventory inventory;
 
-    public Gui(@NotNull ConfigurationSection config) {
+    public Gui(ConfigurationSection config) {
         this(HamsterAPI.replaceColorCode(config.getString("title")),
                 config.getStringList("graphic"),
                 new MapSwapper(config.getConfigurationSection("items")));
@@ -54,7 +53,7 @@ public class Gui implements InventoryHolder {
         }
     }
 
-    public Gui(@NotNull String title, @NotNull List<String> graphic, @NotNull Swapper swapper) {
+    public Gui(String title, List<String> graphic, Swapper swapper) {
         if (graphic.size() == 0) {
             throw new IllegalArgumentException("graphic size can not be less than 1");
         }
