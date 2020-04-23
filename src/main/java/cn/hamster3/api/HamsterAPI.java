@@ -1,9 +1,9 @@
 package cn.hamster3.api;
 
-import cn.hamster3.api.calculator.Calculator;
 import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
+import cn.hamster3.api.utils.calculator.Calculator;
 import com.sun.istack.internal.NotNull;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
@@ -808,7 +808,8 @@ public final class HamsterAPI extends JavaPlugin {
                 config.getString("host"),
                 config.getString("port"),
                 config.getString("user"),
-                config.getString("password"));
+                config.getString("password")
+        );
         if (config.contains("database")) {
             String database = config.getString("database");
             Statement statement = connection.createStatement();

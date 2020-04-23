@@ -1,13 +1,34 @@
-title: "&c自定义界面"
+title: "&a公会页面"
 
 graphic:
-  - "####1234#"
-  - "####5678#"
-  - "#~#qwert#"
-  - "###asdfg#"
-  - "###zxcvb#"
+  - "##1  234#"
+
+buttonIndex:
+  # （无公会时）寻找按钮的位置
+  search: '1'
+  # （会员时）公会主页按钮的位置
+  guild: '1'
+  # （无公会时）创建按钮的位置
+  create: '2'
+  # （会员时）退出公会按钮的位置
+  quit: '2'
+  # （会长时）解散公会的位置
+  dissolution: '2'
+  # 公会排行按钮位置
+  list: '3'
+  manage: '4'
+
+buttonType:
+  search: 's'
+  guild: 'g'
+  create: 'c'
+  quit: 'q'
+  dissolution: 'd'
+  list: 'l'
+  manage: 'm'
 
 items:
+  # gui展示物ID
   '#':
     ==: org.bukkit.inventory.ItemStack
     type: STAINED_GLASS_PANE
@@ -16,243 +37,67 @@ items:
       ==: ItemMeta
       meta-type: UNSPECIFIC
       display-name: "§c屏障"
-  '1':
-    ==: org.bukkit.inventory.ItemStack
-    type: PAPER
-    amount: 1
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c1级保护符"
-      lore:
-        - "§c为你的装备添加3星淬炼保护"
-  '2':
-    ==: org.bukkit.inventory.ItemStack
-    type: PAPER
-    amount: 2
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c2级保护符"
-      lore:
-        - "§c为你的装备添加6星淬炼保护"
-  '3':
-    ==: org.bukkit.inventory.ItemStack
-    type: PAPER
-    amount: 3
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c3级保护符"
-      lore:
-        - "§c为你的装备添加9星淬炼保护"
-  '4':
-    ==: org.bukkit.inventory.ItemStack
-    type: PAPER
-    amount: 4
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c4级保护符"
-      lore:
-        - "§c为你的装备添加12星淬炼保护"
-  '5':
-    ==: org.bukkit.inventory.ItemStack
-    type: COAL
-    amount: 1
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c1级淬炼"
-      lore:
-        - "§c成功率20%"
-  '6':
-    ==: org.bukkit.inventory.ItemStack
-    type: COAL
-    amount: 2
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c2级淬炼"
-      lore:
-        - "§c成功率30%"
-  '7':
-    ==: org.bukkit.inventory.ItemStack
-    type: COAL
-    amount: 3
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c3级淬炼"
-      lore:
-        - "§c成功率40%"
-  '8':
-    ==: org.bukkit.inventory.ItemStack
-    type: COAL
-    amount: 4
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: "§c4级淬炼"
-      lore:
-        - "§c成功率50%"
-  'q':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 4
-    amount: 1
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d1级青灵石'
-      lore:
-        - "§d为装备安装1级青灵石"
-  'w':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 4
-    amount: 2
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d2级青灵石'
-      lore:
-        - "§d为装备安装2级青灵石"
-  'e':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 4
-    amount: 3
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d3级青灵石'
-      lore:
-        - "§d为装备安装3级青灵石"
-  'r':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 4
-    amount: 4
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d4级青灵石'
-      lore:
-        - "§d为装备安装4级青灵石"
-  't':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 4
-    amount: 5
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d5级青灵石'
-      lore:
-        - "§d为装备安装5级青灵石"
-  'a':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 15
-    amount: 1
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d1级烟灵玉'
-      lore:
-        - "§d为装备安装1级烟灵玉"
   's':
     ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 15
-    amount: 2
+    type: COMPASS
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '§d2级烟灵玉'
+      display-name: '寻找公会'
       lore:
-        - "§d为装备安装2级烟灵玉"
-  'd':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 15
-    amount: 3
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d33级烟灵玉'
-      lore:
-        - "§d为装备安装3级烟灵玉"
-  'f':
-    ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 15
-    amount: 4
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d4级烟灵玉'
-      lore:
-        - "§d为装备安装4级烟灵玉"
+        - '§a点击寻找公会'
   'g':
     ==: org.bukkit.inventory.ItemStack
-    type: INK_SACK
-    damage: 15
-    amount: 5
+    type: WATCH
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '§d5级烟灵玉'
+      display-name: '公会主页'
       lore:
-        - "§d为装备安装5级烟灵玉"
-  'z':
-    ==: org.bukkit.inventory.ItemStack
-    type: GHAST_TEAR
-    amount: 1
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d1级水汐石'
-      lore:
-        - "§d为装备安装1级水汐石"
-  'x':
-    ==: org.bukkit.inventory.ItemStack
-    type: GHAST_TEAR
-    amount: 2
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: '§d2级水汐石'
-      lore:
-        - "§d为装备安装2级水汐石"
+        - '§a点击进入公会主页'
   'c':
     ==: org.bukkit.inventory.ItemStack
-    type: GHAST_TEAR
-    amount: 3
+    type: LAVA_BUCKET
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '§d3级水汐石'
+      display-name: '创建公会'
       lore:
-        - "§d为装备安装3级水汐石"
-  'v':
+        - '§a点击创建公会'
+  'q':
     ==: org.bukkit.inventory.ItemStack
-    type: GHAST_TEAR
-    amount: 4
+    type: COAL
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '§d4级水汐石'
+      display-name: '退出公会'
       lore:
-        - "§d为装备安装4级水汐石"
-  'b':
+        - '§a点击退出公会'
+  'd':
     ==: org.bukkit.inventory.ItemStack
-    type: GHAST_TEAR
-    amount: 5
+    type: LEATHER
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '§d5级水汐石'
+      display-name: '解散公会'
       lore:
-        - "§d为装备安装5级水汐石"
+        - '§a点击解散公会'
+  'l':
+    ==: org.bukkit.inventory.ItemStack
+    type: BOW
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: '公会列表'
+      lore:
+        - '§a点击查看公会排行'
+  'm':
+    ==: org.bukkit.inventory.ItemStack
+    type: COAL
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: '管理公会'
+      lore:
+        - '§a点击管理公会'
+

@@ -1,4 +1,4 @@
-package cn.hamster3.api.calculator;
+package cn.hamster3.api.utils.calculator;
 
 import java.util.Collections;
 import java.util.Stack;
