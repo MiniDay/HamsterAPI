@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class ItemMatcher {
@@ -33,7 +34,7 @@ public class ItemMatcher {
         } else {
             id = subID = -1;
         }
-        if (config.contains("name")) {
+        if (config.contains("type")) {
             type = Material.valueOf(config.getString("type"));
         }
         if (config.contains("name")) {
@@ -101,6 +102,37 @@ public class ItemMatcher {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ItemStack) {
+            return match((ItemStack) o);
+        }
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ItemMatcher that = (ItemMatcher) o;
+
+        if (limit != that.limit) return false;
+        if (id != that.id) return false;
+        if (subID != that.subID) return false;
+        if (type != that.type) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(keyLore, that.keyLore)) return false;
+        return Objects.equals(lore, that.lore);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = limit;
+        result = 31 * result + id;
+        result = 31 * result + subID;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (keyLore != null ? keyLore.hashCode() : 0);
+        result = 31 * result + (lore != null ? lore.hashCode() : 0);
+        return result;
     }
 
     @Override
