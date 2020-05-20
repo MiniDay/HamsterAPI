@@ -647,6 +647,27 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
+     * 忽略大小写过滤字符串集合
+     * 将原集合中所有以start开头的字符串取出形成一个新的集合并返回
+     *
+     * @param strings 要过滤的字符串
+     * @param start   关键字
+     * @return 过滤后的字符串
+     */
+    public static ArrayList<String> startWithIgnoreCase(Collection<String> strings, String start) {
+        ArrayList<String> list = new ArrayList<>();
+        if (strings == null || start == null) {
+            return list;
+        }
+        for (String s : strings) {
+            if (s.toLowerCase().startsWith(start.toLowerCase())) {
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    /**
      * 获取玩家的头颅
      * 在1.11以上的服务端中获取头颅材质是在服务器上运行的
      * 因此建议使用异步线程调用该方法
