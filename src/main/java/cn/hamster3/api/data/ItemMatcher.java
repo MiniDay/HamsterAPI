@@ -12,8 +12,6 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ItemMatcher {
     private int limit;
-    private int id;
-    private int subID;
     private Material type;
     private String name;
     private String keyLore;
@@ -21,19 +19,6 @@ public class ItemMatcher {
 
     public ItemMatcher(ConfigurationSection config) {
         limit = config.getInt("limit", 10);
-        if (config.contains("id")) {
-            String idString = config.getString("id");
-            if (idString.contains(":")) {
-                String[] args = idString.split(":");
-                id = Integer.parseInt(args[0]);
-                subID = Integer.parseInt(args[1]);
-            } else {
-                id = Integer.parseInt(idString);
-                subID = -1;
-            }
-        } else {
-            id = subID = -1;
-        }
         if (config.contains("type")) {
             type = Material.valueOf(config.getString("type"));
         }
@@ -52,18 +37,9 @@ public class ItemMatcher {
         return limit;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean match(ItemStack stack) {
         if (type != null) {
             if (stack.getType() != type) {
-                return false;
-            }
-        }
-        if (id != -1) {
-            if (stack.getTypeId() != id) {
-                return false;
-            }
-            if (subID != -1 && stack.getData().getData() != subID) {
                 return false;
             }
         }
@@ -71,10 +47,14 @@ public class ItemMatcher {
             return false;
         }
         ItemMeta meta = stack.getItemMeta();
-        List<String> itemLore = meta.getLore();
+
 
         boolean flag = false;
         if (keyLore != null) {
+            if (meta == null) {
+                return false;
+            }
+            List<String> itemLore = meta.getLore();
             if (itemLore == null) {
                 return false;
             }
@@ -89,6 +69,10 @@ public class ItemMatcher {
             }
         }
         if (lore != null) {
+            if (meta == null) {
+                return false;
+            }
+            List<String> itemLore = meta.getLore();
             if (itemLore == null) {
                 return false;
             }
@@ -115,8 +99,6 @@ public class ItemMatcher {
         ItemMatcher that = (ItemMatcher) o;
 
         if (limit != that.limit) return false;
-        if (id != that.id) return false;
-        if (subID != that.subID) return false;
         if (type != that.type) return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(keyLore, that.keyLore)) return false;
@@ -126,8 +108,6 @@ public class ItemMatcher {
     @Override
     public int hashCode() {
         int result = limit;
-        result = 31 * result + id;
-        result = 31 * result + subID;
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (keyLore != null ? keyLore.hashCode() : 0);
@@ -139,8 +119,6 @@ public class ItemMatcher {
     public String toString() {
         return "Item{" +
                 "limit=" + limit +
-                ", id=" + id +
-                ", subID=" + subID +
                 ", name='" + name + '\'' +
                 ", keyLore='" + keyLore + '\'' +
                 ", lore=" + lore +
