@@ -11,6 +11,7 @@ public abstract class CommandExecutor implements TabExecutor {
     private String description;
     private String permission;
     private String permissionMessage;
+
     private String[] parameters;
 
     public CommandExecutor(String name, String description) {
@@ -59,6 +60,8 @@ public abstract class CommandExecutor implements TabExecutor {
     public String[] getParameters() {
         return parameters;
     }
+
+    public abstract boolean isPlayerCommand();
 
     @Override
     public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);

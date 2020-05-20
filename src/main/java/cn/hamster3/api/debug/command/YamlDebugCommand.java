@@ -27,6 +27,11 @@ public class YamlDebugCommand extends CommandExecutor {
     }
 
     @Override
+    public boolean isPlayerCommand() {
+        return false;
+    }
+
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         YamlConfiguration yml = new YamlConfiguration();
         yml.set("version", Bukkit.getVersion());

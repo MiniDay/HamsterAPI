@@ -12,6 +12,11 @@ public class SleepDebugCommand extends CommandExecutor {
     }
 
     @Override
+    public boolean isPlayerCommand() {
+        return false;
+    }
+
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         long time;
         try {

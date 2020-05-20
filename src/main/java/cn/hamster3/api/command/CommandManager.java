@@ -3,6 +3,7 @@ package cn.hamster3.api.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,11 @@ public abstract class CommandManager extends CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        boolean isPlayer = sender instanceof Player;
+        if (isPlayerCommand() && !isPlayer) {
+            sender.sendMessage("§c这个命令必须由玩家执行!");
+            return true;
+        }
         if (!checkPermission(sender)) {
             sender.sendMessage(getPermissionMessage());
             return true;
@@ -55,6 +61,10 @@ public abstract class CommandManager extends CommandExecutor {
         if (args.length != 0) {
             CommandExecutor executor = getCommandExecutor(args[0]);
             if (executor != null) {
+                if (executor.isPlayerCommand()) {
+                    sender.sendMessage("§c这个命令必须由玩家执行!");
+                    return true;
+                }
                 if (executor.checkPermission(sender)) {
                     return executor.onCommand(sender, command, label, args);
                 }

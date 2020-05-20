@@ -12,4 +12,9 @@ public class HamsterCommand extends CommandManager {
                 new SleepDebugCommand()
         );
     }
+
+    @Override
+    public boolean isPlayerCommand() {
+        return false;
+    }
 }
