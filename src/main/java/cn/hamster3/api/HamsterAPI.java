@@ -4,13 +4,16 @@ import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import cn.hamster3.api.utils.calculator.Calculator;
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Entity;
@@ -40,13 +43,19 @@ import java.util.*;
 @SuppressWarnings("unused")
 public final class HamsterAPI extends JavaPlugin {
     private static HamsterAPI instance;
+
+    private static Chat chat;
     private static Economy economy;
+    private static Permission permission;
+
+    private static PlayerPointsAPI playerPointsAPI;
+
     private static Calculator calculator = new Calculator();
     private static ArrayList<DailyRunnable> daily = new ArrayList<>();
     private static ArrayList<DailyRunnable> asynchronouslyDaily = new ArrayList<>();
     private static DailyThread dailyThread;
 
-    private static String nmsServer;
+    private static String nmsVersion;
     private static boolean useOldMethods = false;
 
     /**
@@ -374,12 +383,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @return 若未安装PlayerPoints则返回null
      */
     public static PlayerPointsAPI getPlayerPointsAPI() {
-        if (!isSetupPlayerPoints()) return null;
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("PlayerPoints");
-        if (plugin instanceof PlayerPoints) {
-            return ((PlayerPoints) plugin).getAPI();
-        }
-        return null;
+        return playerPointsAPI;
     }
 
     /**
@@ -433,13 +437,63 @@ public final class HamsterAPI extends JavaPlugin {
         return economy.has(player, money);
     }
 
+    public static void givePoint(final OfflinePlayer player, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.give(player.getUniqueId(), point);
+        }
+    }
+
+    public static void takePoint(final OfflinePlayer player, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.take(player.getUniqueId(), point);
+        }
+    }
+
+    public static void setPoint(final OfflinePlayer player, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.set(player.getUniqueId(), point);
+        }
+    }
+
+    public static int seePoint(final OfflinePlayer player) {
+        if (playerPointsAPI != null) {
+            return playerPointsAPI.look(player.getUniqueId());
+        }
+        return 0;
+    }
+
+    public static boolean hasPoint(final OfflinePlayer player, final int point) {
+        if (playerPointsAPI != null) {
+            return playerPointsAPI.look(player.getUniqueId()) >= point;
+        }
+        return false;
+    }
+
     /**
-     * 返回Vault前置的Economy实例
+     * 返回 Vault 的 Chat 前置系统
      *
-     * @return Economy实例
+     * @return Chat 系统
+     */
+    public static Chat getChat() {
+        return chat;
+    }
+
+    /**
+     * 返回 Vault 的 Economy 前置系统
+     *
+     * @return Economy 系统
      */
     public static Economy getEconomy() {
         return economy;
+    }
+
+    /**
+     * 返回 Vault 的 Permission 前置系统
+     *
+     * @return Permission 系统
+     */
+    public static Permission getPermission() {
+        return permission;
     }
 
     /**
@@ -472,22 +526,22 @@ public final class HamsterAPI extends JavaPlugin {
             return;
         }
         try {
-            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + nmsServer + ".entity.CraftPlayer");
+            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + nmsVersion + ".entity.CraftPlayer");
             Object craftPlayer = craftPlayerClass.cast(player);
             Object packet;
-            Class<?> packetPlayOutChatClass = Class.forName("net.minecraft.server." + nmsServer + ".PacketPlayOutChat");
-            Class<?> packetClass = Class.forName("net.minecraft.server." + nmsServer + ".Packet");
+            Class<?> packetPlayOutChatClass = Class.forName("net.minecraft.server." + nmsVersion + ".PacketPlayOutChat");
+            Class<?> packetClass = Class.forName("net.minecraft.server." + nmsVersion + ".Packet");
             if (useOldMethods) {
-                Class<?> chatSerializerClass = Class.forName("net.minecraft.server." + nmsServer + ".ChatSerializer");
-                Class<?> iChatBaseComponentClass = Class.forName("net.minecraft.server." + nmsServer + ".IChatBaseComponent");
+                Class<?> chatSerializerClass = Class.forName("net.minecraft.server." + nmsVersion + ".ChatSerializer");
+                Class<?> iChatBaseComponentClass = Class.forName("net.minecraft.server." + nmsVersion + ".IChatBaseComponent");
                 Method m3 = chatSerializerClass.getDeclaredMethod("a", String.class);
                 Object cbc = iChatBaseComponentClass.cast(m3.invoke(chatSerializerClass, "{\"text\": \"" + message + "\"}"));
                 packet = packetPlayOutChatClass.getConstructor(new Class<?>[]{iChatBaseComponentClass, byte.class}).newInstance(cbc, (byte) 2);
             } else {
-                Class<?> chatComponentTextClass = Class.forName("net.minecraft.server." + nmsServer + ".ChatComponentText");
-                Class<?> iChatBaseComponentClass = Class.forName("net.minecraft.server." + nmsServer + ".IChatBaseComponent");
+                Class<?> chatComponentTextClass = Class.forName("net.minecraft.server." + nmsVersion + ".ChatComponentText");
+                Class<?> iChatBaseComponentClass = Class.forName("net.minecraft.server." + nmsVersion + ".IChatBaseComponent");
                 try {
-                    Class<?> chatMessageTypeClass = Class.forName("net.minecraft.server." + nmsServer + ".ChatMessageType");
+                    Class<?> chatMessageTypeClass = Class.forName("net.minecraft.server." + nmsVersion + ".ChatMessageType");
                     Object[] chatMessageTypes = chatMessageTypeClass.getEnumConstants();
                     Object chatMessageType = null;
                     for (Object obj : chatMessageTypes) {
@@ -757,6 +811,61 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
+     * 获取服务器当前全部在线玩家的名字
+     *
+     * @return 在线玩家们的名字
+     */
+    public static ArrayList<String> getOnlinePlayersName() {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            arrayList.add(player.getName());
+        }
+        return arrayList;
+    }
+
+    /**
+     * 获取服务器当前全部在线玩家的名字
+     *
+     * @param startWith 前缀匹配
+     * @return 前缀匹配后的在线玩家们的名字
+     */
+    public static ArrayList<String> getOnlinePlayersName(String startWith) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getName().toLowerCase().startsWith(startWith.toLowerCase())) {
+                arrayList.add(player.getName());
+            }
+        }
+        return arrayList;
+    }
+
+    /**
+     * 获取服务器当前全部在线玩家的UUID
+     *
+     * @return 在线玩家们的UUID
+     */
+    public static ArrayList<UUID> getOnlinePlayersUUID() {
+        ArrayList<UUID> arrayList = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            arrayList.add(player.getUniqueId());
+        }
+        return arrayList;
+    }
+
+    public static String getMCVersion() {
+        return Bukkit.getBukkitVersion().split("-")[0];
+    }
+
+    public static String getNMSVersion() {
+        return Bukkit.getServer().getClass().getName().split("\\.")[3];
+    }
+
+    public static Package getNMSPackage() {
+        String nmsVersion = getNMSVersion();
+        return Package.getPackage("net.minecraft.server." + nmsVersion);
+    }
+
+    /**
      * 创建SQL连接
      *
      * @param host     主机地址
@@ -819,6 +928,42 @@ public final class HamsterAPI extends JavaPlugin {
         return connection;
     }
 
+    public static void reloadVault() {
+        chat = null;
+        economy = null;
+        permission = null;
+        if (!HamsterAPI.isSetupVault()) {
+            sendConsoleMessage("§e§l[HamsterAPI] §c未检测到Vault插件!");
+            return;
+        }
+        sendConsoleMessage("§e§l[HamsterAPI] §a已连接Vault!");
+
+        RegisteredServiceProvider<Chat> chatProvider = Bukkit.getServer().getServicesManager().getRegistration(Chat.class);
+
+        if (chatProvider != null) {
+            chat = chatProvider.getProvider();
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a聊天系统挂接成功...");
+        } else {
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到聊天插件!");
+        }
+
+        RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a经济系统挂接成功...");
+        } else {
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到经济插件!");
+        }
+
+        RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
+        if (permissionProvider != null) {
+            permission = permissionProvider.getProvider();
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a权限系统挂接成功...");
+        } else {
+            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到权限插件!");
+        }
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -826,28 +971,25 @@ public final class HamsterAPI extends JavaPlugin {
         HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件正在初始化...");
         dailyThread = new DailyThread();
         dailyThread.start();
-        getCommand("HamsterAPI").setExecutor(new HamsterCommand(this));
+        PluginCommand command = getCommand("HamsterAPI");
+        HamsterCommand hamsterCommand = new HamsterCommand(command, this);
+        command.setExecutor(hamsterCommand);
+
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        nmsServer = Bukkit.getServer().getClass().getPackage().getName();
-        nmsServer = nmsServer.substring(nmsServer.lastIndexOf(".") + 1);
+        nmsVersion = getNMSVersion();
 
-        if (nmsServer.equalsIgnoreCase("v1_8_R1") || nmsServer.startsWith("v1_7_")) {
+        if (nmsVersion.equalsIgnoreCase("v1_8_R1") || nmsVersion.startsWith("v1_7_")) {
             useOldMethods = true;
         }
         HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件已启动!");
 
         Bukkit.getScheduler().runTask(this, () -> {
-            if (!HamsterAPI.isSetupVault()) {
-                sendConsoleMessage("§e§l[HamsterAPI] §c未检测到Vault插件!");
-            } else {
-                sendConsoleMessage("§e§l[HamsterAPI] §a已连接Vault!");
-                RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-                if (economyProvider != null) {
-                    economy = economyProvider.getProvider();
-                    HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a经济系统挂接成功...");
-                } else {
-                    HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到经济插件!");
+            reloadVault();
+            if (isSetupPlayerPoints()) {
+                Plugin plugin = Bukkit.getPluginManager().getPlugin("PlayerPoints");
+                if (plugin instanceof PlayerPoints) {
+                    playerPointsAPI = ((PlayerPoints) plugin).getAPI();
                 }
             }
         });

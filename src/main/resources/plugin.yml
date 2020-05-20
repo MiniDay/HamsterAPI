@@ -6,7 +6,7 @@ load: STARTUP
 softdepend:
   - Vault
   - PlayerPoints
-authors: [Viosin]
+authors: [Hamster3]
 description: 一个方便开发者使用的API
 commands:
   HamsterAPI:
