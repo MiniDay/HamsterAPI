@@ -2,6 +2,7 @@
 叁只仓鼠个人使用的API
 
 # 现已支持构建工具
+[![](https://jitpack.io/v/cn.hamster3/HamsterAPI.svg)](https://jitpack.io/#cn.hamster3/HamsterAPI)
 ## Maven
 ```xml
 	<repositories>
@@ -13,7 +14,7 @@
 ```
 ```xml
 	<dependency>
-	    <groupId>com.github.MiniDay</groupId>
+	    <groupId>cn.hamster3</groupId>
 	    <artifactId>HamsterAPI</artifactId>
 	    <version>2.2.0</version>
         <scope>provided</scope>
@@ -29,7 +30,7 @@
 ```
 ```gradle
 	dependencies {
-	        compileOnly 'com.github.MiniDay:HamsterAPI:2.2.0'
+	        compileOnly 'cn.hamster3:HamsterAPI:2.2.0'
 	}
 ```
 
