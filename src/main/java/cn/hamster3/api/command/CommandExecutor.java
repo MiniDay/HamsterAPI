@@ -64,11 +64,15 @@ public abstract class CommandExecutor implements TabExecutor {
 
     public abstract boolean isPlayerCommand();
 
+    public String getNotPlayerMessage() {
+        return "§c这个命令必须由玩家执行!";
+    }
+
     @Override
     public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
 
     @Override
-    public abstract List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args);
+    public abstract List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args);
 
     @Override
     public boolean equals(Object o) {

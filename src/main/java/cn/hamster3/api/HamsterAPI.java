@@ -4,6 +4,7 @@ import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import cn.hamster3.api.utils.Calculator;
+import net.md_5.bungee.api.chat.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -97,7 +98,7 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 发送一条控制台消息
+     * 发送多条控制台消息
      *
      * @param message 要发送的消息
      */
@@ -820,6 +821,58 @@ public final class HamsterAPI extends JavaPlugin {
             }
         }
         return stack.getType().name();
+    }
+
+    public static TextComponent getItemDisplayInfo(String startText, ItemStack stack, String endText) {
+        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ITEM, getItemInfo(stack));
+
+        TextComponent startComponent = new TextComponent(startText);
+        startComponent.setHoverEvent(hoverEvent);
+        TextComponent endComponent = new TextComponent(endText);
+        endComponent.setHoverEvent(hoverEvent);
+
+        BaseComponent itemComponent = getItemNameComponent(stack);
+        itemComponent.setHoverEvent(hoverEvent);
+
+        return new TextComponent(
+                new ComponentBuilder()
+                        .append(startComponent)
+                        .append(itemComponent)
+                        .append(endComponent)
+                        .create()
+        );
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static BaseComponent getItemNameComponent(ItemStack stack) {
+        if (isEmptyItemStack(stack)) {
+            return new TranslatableComponent("block.minecraft.air");
+        } else if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
+            return new TextComponent(getItemName(stack));
+        }
+        Material type = stack.getType();
+        if (type.isBlock()) {
+            return new TranslatableComponent("block.minecraft." + type.name().toLowerCase());
+        } else {
+            return new TranslatableComponent("item.minecraft." + type.name().toLowerCase());
+        }
+
+    }
+
+    public static BaseComponent[] getItemInfo(ItemStack stack) {
+        try {
+            Class<?> nBTTagCompound = Class.forName("net.minecraft.server." + nmsVersion + ".NBTTagCompound");
+            Object nBTTag = nBTTagCompound.newInstance();
+            Class<?> craftItemStack = Class.forName("org.bukkit.craftbukkit." + nmsVersion + ".inventory.CraftItemStack");
+            Method asNMSCopy = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
+            Object nmsItem = asNMSCopy.invoke(null, stack);
+            Method saveMethod = nmsItem.getClass().getMethod("save", nBTTagCompound);
+            saveMethod.invoke(nmsItem, nBTTag);
+            return new ComponentBuilder(nBTTag.toString()).create();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ComponentBuilder("物品解析失败").create();
     }
 
     /**

@@ -9,7 +9,8 @@ public class HamsterCommand extends CommandManager {
         super(
                 command,
                 new YamlDebugCommand(hamster),
-                new SleepDebugCommand()
+                new SleepDebugCommand(),
+                new ShowItemCommand()
         );
     }
 

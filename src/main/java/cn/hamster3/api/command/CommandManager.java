@@ -24,7 +24,15 @@ public abstract class CommandManager extends CommandExecutor {
         subCommands.addAll(Arrays.asList(commandExecutors));
     }
 
-    protected void sendHelp(CommandSender sender) {
+    protected String helpTop(CommandSender sender, Command command, String label, String[] args) {
+        return "§e==================== [" + getName() + "使用帮助] ====================";
+    }
+
+    protected String helpButton(CommandSender sender, Command command, String label, String[] args) {
+        return "§e==================== [" + getName() + "使用帮助] ====================";
+    }
+
+    protected void sendHelp(CommandSender sender, Command command, String label, String[] args) {
         sender.sendMessage("§e==================== [" + getName() + "使用帮助] ====================");
         for (CommandExecutor executor : subCommands) {
             if (!executor.checkPermission(sender)) {
@@ -43,7 +51,7 @@ public abstract class CommandManager extends CommandExecutor {
     }
 
     protected boolean defaultCommand(CommandSender sender, Command command, String label, String[] args) {
-        sendHelp(sender);
+        sendHelp(sender, command, label, args);
         return true;
     }
 
@@ -51,7 +59,7 @@ public abstract class CommandManager extends CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         boolean isPlayer = sender instanceof Player;
         if (isPlayerCommand() && !isPlayer) {
-            sender.sendMessage("§c这个命令必须由玩家执行!");
+            sender.sendMessage(getNotPlayerMessage());
             return true;
         }
         if (!checkPermission(sender)) {
@@ -62,7 +70,7 @@ public abstract class CommandManager extends CommandExecutor {
             CommandExecutor executor = getCommandExecutor(args[0]);
             if (executor != null) {
                 if (executor.isPlayerCommand() && !isPlayer) {
-                    sender.sendMessage("§c这个命令必须由玩家执行!");
+                    sender.sendMessage(executor.getNotPlayerMessage());
                     return true;
                 }
                 if (executor.checkPermission(sender)) {
@@ -76,7 +84,7 @@ public abstract class CommandManager extends CommandExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!checkPermission(sender)) {
             return null;
         }
@@ -95,7 +103,7 @@ public abstract class CommandManager extends CommandExecutor {
             return null;
         }
         if (executor.checkPermission(sender)) {
-            return executor.onTabComplete(sender, command, label, args);
+            return executor.onTabComplete(sender, command, alias, args);
         }
         return null;
     }
