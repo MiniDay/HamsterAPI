@@ -61,7 +61,7 @@ public abstract class CommandManager extends CommandExecutor {
         if (args.length != 0) {
             CommandExecutor executor = getCommandExecutor(args[0]);
             if (executor != null) {
-                if (executor.isPlayerCommand()) {
+                if (executor.isPlayerCommand() && !isPlayer) {
                     sender.sendMessage("§c这个命令必须由玩家执行!");
                     return true;
                 }
