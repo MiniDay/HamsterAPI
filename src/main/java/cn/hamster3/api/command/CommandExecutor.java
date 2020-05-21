@@ -6,6 +6,7 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public abstract class CommandExecutor implements TabExecutor {
     private String name;
     private String description;

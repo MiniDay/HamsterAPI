@@ -33,8 +33,8 @@ public class SwapItemListener implements Listener {
         this.handlerClass = handler;
     }
 
+    @SuppressWarnings({"ConstantConditions", "deprecation"})
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    @Deprecated
     public void putItem(InventoryClickEvent event) {
         int rawSlot = event.getRawSlot();
         if (rawSlot < 0) {

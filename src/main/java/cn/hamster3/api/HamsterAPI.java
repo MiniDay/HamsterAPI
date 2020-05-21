@@ -3,7 +3,7 @@ package cn.hamster3.api;
 import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
-import cn.hamster3.api.utils.calculator.Calculator;
+import cn.hamster3.api.utils.Calculator;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -676,8 +676,31 @@ public final class HamsterAPI extends JavaPlugin {
      * @return 玩家的头颅物品
      */
     public static ItemStack getPlayerHead(UUID uuid) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        return getPlayerHead(player.getName());
+        return getPlayerHead(Bukkit.getOfflinePlayer(uuid));
+    }
+
+    /**
+     * 获取玩家的头颅
+     * 在1.11以上的服务端中获取头颅材质是在服务器上运行的
+     * 因此建议使用异步线程调用该方法
+     *
+     * @param offlinePlayer 要获取的玩家
+     * @return 玩家的头颅物品
+     */
+    @SuppressWarnings("deprecation")
+    public static ItemStack getPlayerHead(OfflinePlayer offlinePlayer) {
+        ItemStack stack;
+        try {
+            stack = new ItemStack(Material.valueOf("PLAYER_HEAD"));
+        } catch (IllegalArgumentException e) {
+            stack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+        }
+        SkullMeta meta = (SkullMeta) stack.getItemMeta();
+        if (meta != null) {
+            meta.setOwningPlayer(offlinePlayer);
+        }
+        stack.setItemMeta(meta);
+        return stack;
     }
 
     /**
@@ -688,6 +711,8 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name 要获取的玩家
      * @return 玩家的头颅物品
      */
+    @Deprecated
+    @SuppressWarnings("ConstantConditions")
     public static ItemStack getPlayerHead(String name) {
         ItemStack stack;
         try {
@@ -783,6 +808,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param stack 物品
      * @return 物品的名称
      */
+    @SuppressWarnings("ConstantConditions")
     public static String getItemName(ItemStack stack) {
         if (stack == null) {
             return "null";
@@ -986,6 +1012,7 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onEnable() {
         instance = this;
         ConfigurationSerialization.registerClass(DisplayMessage.class);

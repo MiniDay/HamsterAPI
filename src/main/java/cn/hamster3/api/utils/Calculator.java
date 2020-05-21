@@ -1,4 +1,4 @@
-package cn.hamster3.api.utils.calculator;
+package cn.hamster3.api.utils;
 
 import java.util.Collections;
 import java.util.Stack;
@@ -7,8 +7,10 @@ import java.util.Stack;
  * 算数表达式求值
  * 传入算数表达式，将返回一个浮点值结果
  * 如果计算过程错误，将返回一个NaN
+ * <p>
+ * 我也忘了这个类是哪里抄来的
+ * 反正它运行起来比直接用JavaScript引擎计算要快很多
  */
-
 public class Calculator {
     // 默认除法运算精度
     private static final int DEF_DIV_SCALE = 16;

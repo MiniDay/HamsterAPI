@@ -32,6 +32,7 @@ public class YamlDebugCommand extends CommandExecutor {
     }
 
     @Override
+    @SuppressWarnings({"ConstantConditions", "deprecation"})
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         YamlConfiguration yml = new YamlConfiguration();
         yml.set("version", Bukkit.getVersion());
