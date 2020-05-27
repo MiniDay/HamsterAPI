@@ -32,6 +32,11 @@ public abstract class Handler implements InventoryHolder {
         return false;
     }
 
+    /**
+     * 当这个Handler所属的Inventory被点击时发生
+     *
+     * @param event Inventory点击事件
+     */
     public void click(InventoryClickEvent event) {
     }
 
