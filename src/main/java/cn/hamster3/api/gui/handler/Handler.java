@@ -1,6 +1,7 @@
 package cn.hamster3.api.gui.handler;
 
 import cn.hamster3.api.gui.Gui;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,12 @@ public abstract class Handler implements InventoryHolder {
      * @param stack 将要替换的物品
      * @return true代表允许
      */
-    public abstract boolean canPutItem(int index, ItemStack stack);
+    public boolean canPutItem(int index, ItemStack stack) {
+        return false;
+    }
+
+    public void click(InventoryClickEvent event) {
+    }
 
     /**
      * 成功向GUI中放入一个物品时会由SwapItemListener调用这个事件

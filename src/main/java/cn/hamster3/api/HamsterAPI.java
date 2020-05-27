@@ -856,7 +856,6 @@ public final class HamsterAPI extends JavaPlugin {
         } else {
             return new TranslatableComponent("item.minecraft." + type.name().toLowerCase());
         }
-
     }
 
     public static BaseComponent[] getItemInfo(ItemStack stack) {
@@ -1154,4 +1153,3 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
 }
-
