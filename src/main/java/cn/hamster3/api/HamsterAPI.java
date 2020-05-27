@@ -1,6 +1,7 @@
 package cn.hamster3.api;
 
 import cn.hamster3.api.debug.command.HamsterCommand;
+import cn.hamster3.api.gui.listener.GuiClickListener;
 import cn.hamster3.api.gui.swapper.Swapper;
 import cn.hamster3.api.runnable.DailyRunnable;
 import cn.hamster3.api.utils.Calculator;
@@ -1082,6 +1083,7 @@ public final class HamsterAPI extends JavaPlugin {
         if (nmsVersion.equalsIgnoreCase("v1_8_R1") || nmsVersion.startsWith("v1_7_")) {
             useOldMethods = true;
         }
+        Bukkit.getPluginManager().registerEvents(new GuiClickListener(), this);
         HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件已启动!");
 
         Bukkit.getScheduler().runTask(this, () -> {
