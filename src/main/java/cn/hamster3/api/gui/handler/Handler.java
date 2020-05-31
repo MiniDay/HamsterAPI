@@ -11,9 +11,9 @@ import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public abstract class Handler implements InventoryHolder {
-    private Gui gui;
-    private Inventory inventory;
-    private HashMap<Integer, ItemStack> placedItem;
+    private final Gui gui;
+    private final Inventory inventory;
+    private final HashMap<Integer, ItemStack> placedItem;
 
     public Handler(Gui gui) {
         this.gui = gui;
@@ -38,6 +38,11 @@ public abstract class Handler implements InventoryHolder {
      * @param event Inventory点击事件
      */
     public void click(InventoryClickEvent event) {
+    }
+
+    //todo 窗口按钮初始化
+    protected void initGUI() {
+
     }
 
     /**

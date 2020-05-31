@@ -52,9 +52,9 @@ public final class HamsterAPI extends JavaPlugin {
 
     private static PlayerPointsAPI playerPointsAPI;
 
-    private static Calculator calculator = new Calculator();
-    private static ArrayList<DailyRunnable> daily = new ArrayList<>();
-    private static ArrayList<DailyRunnable> asynchronouslyDaily = new ArrayList<>();
+    private static final Calculator calculator = new Calculator();
+    private static final ArrayList<DailyRunnable> daily = new ArrayList<>();
+    private static final ArrayList<DailyRunnable> asynchronouslyDaily = new ArrayList<>();
     private static DailyThread dailyThread;
 
     private static String nmsVersion;
@@ -965,6 +965,10 @@ public final class HamsterAPI extends JavaPlugin {
         return Package.getPackage("net.minecraft.server." + nmsVersion);
     }
 
+    public static Class<?> getNMSClass(String className) throws ClassNotFoundException {
+        return Class.forName("net.minecraft.server." + nmsVersion + "." + className);
+    }
+
     /**
      * 创建SQL连接
      *
@@ -1106,7 +1110,7 @@ public final class HamsterAPI extends JavaPlugin {
 
     private final static class DailyThread extends Thread {
         private boolean stop;
-        private long time;
+        private final long time;
 
         private DailyThread() {
             Calendar now = Calendar.getInstance();
@@ -1119,6 +1123,7 @@ public final class HamsterAPI extends JavaPlugin {
         }
 
         @Override
+        @SuppressWarnings("BusyWait")
         public void run() {
             if (stop) return;
 

@@ -71,6 +71,7 @@ public class Gui implements InventoryHolder {
         }
     }
 
+    //todo 这个方法可能有bug
     public Character indexOf(int i) {
         if (i < 0) return null;
         if (i / 9 >= graphic.size()) return null;
