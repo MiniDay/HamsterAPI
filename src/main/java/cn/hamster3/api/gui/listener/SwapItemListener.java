@@ -27,7 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * 若不允许，则取消事件
  */
 public class SwapItemListener implements Listener {
-    private Class<? extends Handler> handlerClass;
+    private final Class<? extends Handler> handlerClass;
 
     public SwapItemListener(Class<? extends Handler> handler) {
         this.handlerClass = handler;

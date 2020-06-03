@@ -12,7 +12,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public abstract class CommandManager extends CommandExecutor {
-    private HashSet<CommandExecutor> subCommands;
+    private final HashSet<CommandExecutor> subCommands;
 
     public CommandManager(PluginCommand command) {
         super(command.getName(), command.getDescription(), command.getPermission(), command.getPermissionMessage());

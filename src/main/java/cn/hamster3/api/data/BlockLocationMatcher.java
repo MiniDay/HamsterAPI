@@ -7,12 +7,12 @@ import org.bukkit.configuration.ConfigurationSection;
 
 @SuppressWarnings({"ConstantConditions", "unused"})
 public class BlockLocationMatcher {
-    private String worldName;
+    private final String worldName;
     private int x;
     private int y;
     private int z;
 
-    private World world;
+    private final World world;
     private Location location;
 
     public BlockLocationMatcher(Location location) {

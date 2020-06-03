@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class YamlDebugCommand extends CommandExecutor {
-    private HamsterAPI hamster;
+    private final HamsterAPI hamster;
 
     public YamlDebugCommand(HamsterAPI hamster) {
         super("yml", "将测试数据存放至yml文件中");

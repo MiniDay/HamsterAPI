@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class ItemMatcher {
-    private int limit;
+    private final int limit;
     private Material type;
     private String name;
     private String keyLore;

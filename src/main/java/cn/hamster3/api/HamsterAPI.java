@@ -44,17 +44,14 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public final class HamsterAPI extends JavaPlugin {
-    private static HamsterAPI instance;
-
-    private static Chat chat;
-    private static Economy economy;
-    private static Permission permission;
-
-    private static PlayerPointsAPI playerPointsAPI;
-
     private static final Calculator calculator = new Calculator();
     private static final ArrayList<DailyRunnable> daily = new ArrayList<>();
     private static final ArrayList<DailyRunnable> asynchronouslyDaily = new ArrayList<>();
+    private static HamsterAPI instance;
+    private static Chat chat;
+    private static Economy economy;
+    private static Permission permission;
+    private static PlayerPointsAPI playerPointsAPI;
     private static DailyThread dailyThread;
 
     private static String nmsVersion;
@@ -400,6 +397,13 @@ public final class HamsterAPI extends JavaPlugin {
         }
     }
 
+    public static boolean giveMoney(final UUID uuid, final double money) {
+        if (isSetupEconomy()) {
+            return economy.depositPlayer(Bukkit.getOfflinePlayer(uuid), money).transactionSuccess();
+        }
+        return false;
+    }
+
     /**
      * 从玩家账户上取走钱
      *
@@ -410,6 +414,13 @@ public final class HamsterAPI extends JavaPlugin {
         if (isSetupEconomy()) {
             economy.withdrawPlayer(player, money);
         }
+    }
+
+    public static boolean takeMoney(final UUID uuid, final double money) {
+        if (isSetupEconomy()) {
+            return economy.withdrawPlayer(Bukkit.getOfflinePlayer(uuid), money).transactionSuccess();
+        }
+        return false;
     }
 
     /**
@@ -423,6 +434,13 @@ public final class HamsterAPI extends JavaPlugin {
             return Double.NaN;
         }
         return economy.getBalance(player);
+    }
+
+    public static double seeMoney(final UUID uuid) {
+        if (!isSetupEconomy()) {
+            return Double.NaN;
+        }
+        return economy.getBalance(Bukkit.getOfflinePlayer(uuid));
     }
 
     /**
@@ -439,9 +457,22 @@ public final class HamsterAPI extends JavaPlugin {
         return economy.has(player, money);
     }
 
+    public static boolean hasMoney(final UUID uuid, final double money) {
+        if (!isSetupEconomy()) {
+            return false;
+        }
+        return economy.has(Bukkit.getOfflinePlayer(uuid), money);
+    }
+
     public static void givePoint(final OfflinePlayer player, final int point) {
         if (playerPointsAPI != null) {
             playerPointsAPI.give(player.getUniqueId(), point);
+        }
+    }
+
+    public static void givePoint(final UUID uuid, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.give(uuid, point);
         }
     }
 
@@ -451,9 +482,21 @@ public final class HamsterAPI extends JavaPlugin {
         }
     }
 
+    public static void takePoint(final UUID uuid, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.take(uuid, point);
+        }
+    }
+
     public static void setPoint(final OfflinePlayer player, final int point) {
         if (playerPointsAPI != null) {
             playerPointsAPI.set(player.getUniqueId(), point);
+        }
+    }
+
+    public static void setPoint(final UUID uuid, final int point) {
+        if (playerPointsAPI != null) {
+            playerPointsAPI.set(uuid, point);
         }
     }
 
@@ -464,9 +507,23 @@ public final class HamsterAPI extends JavaPlugin {
         return 0;
     }
 
+    public static int seePoint(final UUID uuid) {
+        if (playerPointsAPI != null) {
+            return playerPointsAPI.look(uuid);
+        }
+        return 0;
+    }
+
     public static boolean hasPoint(final OfflinePlayer player, final int point) {
         if (playerPointsAPI != null) {
             return playerPointsAPI.look(player.getUniqueId()) >= point;
+        }
+        return false;
+    }
+
+    public static boolean hasPoint(final UUID uuid, final int point) {
+        if (playerPointsAPI != null) {
+            return playerPointsAPI.look(uuid) >= point;
         }
         return false;
     }
@@ -1109,8 +1166,8 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     private final static class DailyThread extends Thread {
-        private boolean stop;
         private final long time;
+        private boolean stop;
 
         private DailyThread() {
             Calendar now = Calendar.getInstance();

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapSwapper implements Swapper {
-    private Map<Character, ItemStack> items;
+    private final Map<Character, ItemStack> items;
 
     public MapSwapper(Map<Character, ItemStack> items) {
         this.items = items;

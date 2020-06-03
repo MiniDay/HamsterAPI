@@ -3,9 +3,9 @@ package cn.hamster3.api.runnable;
 import org.bukkit.plugin.Plugin;
 
 public class DailyRunnable {
-    private Plugin plugin;
-    private String name;
-    private Runnable runnable;
+    private final Plugin plugin;
+    private final String name;
+    private final Runnable runnable;
 
     public DailyRunnable(Plugin plugin, String name, Runnable runnable) {
         this.plugin = plugin;

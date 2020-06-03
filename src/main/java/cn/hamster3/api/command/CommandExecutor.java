@@ -8,8 +8,8 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public abstract class CommandExecutor implements TabExecutor {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     private String permission;
     private String permissionMessage;
 
