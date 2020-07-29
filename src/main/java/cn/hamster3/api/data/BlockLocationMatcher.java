@@ -51,6 +51,26 @@ public class BlockLocationMatcher {
         return location;
     }
 
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

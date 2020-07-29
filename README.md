@@ -5,20 +5,22 @@
 [![](https://jitpack.io/v/cn.hamster3/HamsterAPI.svg)](https://jitpack.io/#cn.hamster3/HamsterAPI)
 ## Maven
 ```xml
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
 ```xml
+<dependencies>
     <dependency>
         <groupId>cn.hamster3</groupId>
         <artifactId>HamsterAPI</artifactId>
-        <version>2.3.4-SNAPSHOT</version>
+        <version>2.3.5-SNAPSHOT</version>
         <scope>provided</scope>
     </dependency>
+</dependencies>
 ```
 ## Gradle
 ```gradle
@@ -30,7 +32,7 @@
 ```
 ```gradle
 	dependencies {
-	        compileOnly 'cn.hamster3:HamsterAPI:2.3.4-SNAPSHOT'
+	        compileOnly 'cn.hamster3:HamsterAPI:2.3.5-SNAPSHOT'
 	}
 ```
 

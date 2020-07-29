@@ -111,6 +111,30 @@ public class ItemMatcher {
         return true;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getSubID() {
+        return subID;
+    }
+
+    public Material getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getKeyLore() {
+        return keyLore;
+    }
+
+    public List<String> getLore() {
+        return lore;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
