@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +13,8 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ItemMatcher {
     private final int limit;
+    private final int id;
+    private final int subID;
     private Material type;
     private String name;
     private String keyLore;
@@ -19,6 +22,19 @@ public class ItemMatcher {
 
     public ItemMatcher(ConfigurationSection config) {
         limit = config.getInt("limit", 10);
+        String idString = config.getString("id");
+        if (idString != null) {
+            if (idString.contains(":")) {
+                String[] args = idString.split(":");
+                id = Integer.parseInt(args[0]);
+                subID = Integer.parseInt(args[1]);
+            } else {
+                id = Integer.parseInt(idString);
+                subID = -1;
+            }
+        } else {
+            id = subID = -1;
+        }
         if (config.contains("type")) {
             type = Material.valueOf(config.getString("type"));
         }
@@ -37,27 +53,41 @@ public class ItemMatcher {
         return limit;
     }
 
+    @SuppressWarnings("deprecation")
     public boolean match(ItemStack stack) {
         if (type != null) {
             if (stack.getType() != type) {
                 return false;
             }
         }
+        if (id != -1) {
+            if (stack.getType().getId() != id) {
+                return false;
+            }
+            if (subID != -1) {
+                MaterialData data = stack.getData();
+                if (data == null) {
+                    return false;
+                }
+                if (data.getData() != subID) {
+                    return false;
+                }
+            }
+        }
         if (name != null && !name.equals(HamsterAPI.getItemName(stack))) {
             return false;
         }
         ItemMeta meta = stack.getItemMeta();
-
+        if (meta == null) {
+            return keyLore == null && lore == null;
+        }
+        List<String> itemLore = meta.getLore();
+        if (itemLore == null) {
+            return keyLore == null && lore == null;
+        }
 
         boolean flag = false;
         if (keyLore != null) {
-            if (meta == null) {
-                return false;
-            }
-            List<String> itemLore = meta.getLore();
-            if (itemLore == null) {
-                return false;
-            }
             for (String s : itemLore) {
                 if (s.contains(keyLore)) {
                     flag = true;
@@ -69,13 +99,6 @@ public class ItemMatcher {
             }
         }
         if (lore != null) {
-            if (meta == null) {
-                return false;
-            }
-            List<String> itemLore = meta.getLore();
-            if (itemLore == null) {
-                return false;
-            }
             if (lore.size() != itemLore.size()) {
                 return false;
             }
@@ -99,6 +122,8 @@ public class ItemMatcher {
         ItemMatcher that = (ItemMatcher) o;
 
         if (limit != that.limit) return false;
+        if (id != that.id) return false;
+        if (subID != that.subID) return false;
         if (type != that.type) return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(keyLore, that.keyLore)) return false;
@@ -108,6 +133,8 @@ public class ItemMatcher {
     @Override
     public int hashCode() {
         int result = limit;
+        result = 31 * result + id;
+        result = 31 * result + subID;
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (keyLore != null ? keyLore.hashCode() : 0);
@@ -119,6 +146,8 @@ public class ItemMatcher {
     public String toString() {
         return "Item{" +
                 "limit=" + limit +
+                ", id=" + id +
+                ", subID=" + subID +
                 ", name='" + name + '\'' +
                 ", keyLore='" + keyLore + '\'' +
                 ", lore=" + lore +

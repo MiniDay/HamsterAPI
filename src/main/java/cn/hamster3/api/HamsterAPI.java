@@ -1041,7 +1041,7 @@ public final class HamsterAPI extends JavaPlugin {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ignored) {
         }
-        return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true", user, password);
+        return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false", user, password);
     }
 
     /**
