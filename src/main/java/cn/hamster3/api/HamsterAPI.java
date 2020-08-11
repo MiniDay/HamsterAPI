@@ -3,8 +3,10 @@ package cn.hamster3.api;
 import cn.hamster3.api.debug.command.HamsterCommand;
 import cn.hamster3.api.gui.listener.GuiClickListener;
 import cn.hamster3.api.gui.swapper.Swapper;
-import cn.hamster3.api.runnable.DailyRunnable;
+import cn.hamster3.api.runnable.DailyTask;
+import cn.hamster3.api.runnable.DailyTaskThread;
 import cn.hamster3.api.utils.Calculator;
+import cn.hamster3.api.utils.LogUtils;
 import net.md_5.bungee.api.chat.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -45,17 +47,18 @@ import java.util.*;
 @SuppressWarnings("unused")
 public final class HamsterAPI extends JavaPlugin {
     private static final Calculator calculator = new Calculator();
-    private static final ArrayList<DailyRunnable> daily = new ArrayList<>();
-    private static final ArrayList<DailyRunnable> asynchronouslyDaily = new ArrayList<>();
     private static HamsterAPI instance;
     private static Chat chat;
     private static Economy economy;
     private static Permission permission;
     private static PlayerPointsAPI playerPointsAPI;
-    private static DailyThread dailyThread;
+
+    private static DailyTaskThread dailyTaskThread;
 
     private static String nmsVersion;
     private static boolean useOldMethods = false;
+
+    private static LogUtils logUtils;
 
     /**
      * 计算一条字符串数学公式
@@ -200,6 +203,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param swapper   Item交换器
      * @param graphics  GUI图形
      */
+    @Deprecated
     public static void fillInventory(final Inventory inventory, final Swapper swapper, final List<String> graphics) {
         HashMap<Character, ItemStack> map = new HashMap<>();
         for (String s : graphics) {
@@ -226,46 +230,64 @@ public final class HamsterAPI extends JavaPlugin {
      * @param swapper   Item交换器
      * @param graphics  GUI图形
      */
+    @Deprecated
     public static void fillInventory(Inventory inventory, Swapper swapper, String[] graphics) {
         fillInventory(inventory, swapper, Arrays.asList(graphics));
     }
 
     /**
-     * 创建一个每日运行的线程
-     * 该线程会在每天的0点运行一次
+     * 创建一个每日运行的任务
+     * 该任务会在每天的0点运行一次
      *
      * @param runnable       要运行的方法
-     * @param asynchronously 是否在服务器主线程上运行
-     * @param plugin         运行这个线程的插件
-     * @param name           线程的名字
+     * @param asynchronously 是否异步运行
+     * @param plugin         运行这个任务的插件对象
+     * @param name           线程的名字（不可与其他线程名字重复
      * @return 是否成功创建线程
      */
     public static boolean addDailyRunnable(Runnable runnable, boolean asynchronously, Plugin plugin, String name) {
-        DailyRunnable dailyRunnable = new DailyRunnable(plugin, name, runnable);
-        if (asynchronously) asynchronouslyDaily.add(dailyRunnable);
-        else daily.add(dailyRunnable);
+        if (runnable == null) {
+            throw new IllegalArgumentException("runnable 不能为 null!");
+        }
+        if (plugin == null) {
+            throw new IllegalArgumentException("plugin 不能为 null!");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("name 不能为 null!");
+        }
+        if (dailyTaskThread.getDailyTask(plugin, name) != null) {
+            return false;
+        }
+
+        DailyTask dailyTask = new DailyTask(plugin, name, !asynchronously) {
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        };
         return true;
     }
 
     /**
-     * 取消已经创建了的每日线程
+     * 取消该插件已经创建了的所有每日任务
      *
-     * @param name 线程的名字
+     * @param plugin 插件实例
      * @return 是否成功取消
      */
-    public static boolean cancelDailyRunnable(String name) {
-        boolean flag = false;
-        for (DailyRunnable runnable : new ArrayList<>(daily)) {
-            if (runnable.getName().equals(name)) {
-                daily.remove(runnable);
-                flag = true;
-            }
+    public static boolean cancelDailyRunnable(Plugin plugin) {
+        if (plugin == null) {
+            throw new IllegalArgumentException("plugin 不能为 null!");
         }
-        for (DailyRunnable runnable : new ArrayList<>(asynchronouslyDaily)) {
-            if (runnable.getName().equals(name)) {
-                asynchronouslyDaily.remove(runnable);
-                flag = true;
+        boolean flag = false;
+        ArrayList<DailyTask> tasks = dailyTaskThread.getTasks();
+        for (int i = 0; i < tasks.size(); i++) {
+            DailyTask task = tasks.get(i);
+            if (!task.getPlugin().equals(plugin)) {
+                continue;
             }
+            tasks.remove(i);
+            i--;
+            flag = true;
         }
         return flag;
     }
@@ -274,68 +296,29 @@ public final class HamsterAPI extends JavaPlugin {
      * 取消该插件已经创建了的所有每日线程
      *
      * @param plugin 插件实例
-     * @return 是否成功取消
-     */
-    public static boolean cancelDailyRunnable(Plugin plugin) {
-        boolean flag = false;
-        for (DailyRunnable runnable : new ArrayList<>(daily)) {
-            if (runnable.getPlugin().equals(plugin)) {
-                daily.remove(runnable);
-                flag = true;
-            }
-        }
-        for (DailyRunnable runnable : new ArrayList<>(asynchronouslyDaily)) {
-            if (runnable.getPlugin().equals(plugin)) {
-                asynchronouslyDaily.remove(runnable);
-                flag = true;
-            }
-        }
-        return flag;
-    }
-
-    /**
-     * 取消该插件已经创建了的所有名称匹配的每日线程
-     *
-     * @param plugin 插件实例
-     * @param name   线程名称
+     * @param name   任务名称
      * @return 是否成功取消
      */
     public static boolean cancelDailyRunnable(Plugin plugin, String name) {
+        if (plugin == null) {
+            throw new IllegalArgumentException("plugin 不能为 null!");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("name 不能为 null!");
+        }
         boolean flag = false;
-        for (DailyRunnable runnable : new ArrayList<>(daily)) {
-            if (runnable.getName().equals(name) && runnable.getPlugin().equals(plugin)) {
-                daily.remove(runnable);
-                flag = true;
+        ArrayList<DailyTask> tasks = dailyTaskThread.getTasks();
+        for (int i = 0; i < tasks.size(); i++) {
+            DailyTask task = tasks.get(i);
+            if (!task.getPlugin().equals(plugin)) {
+                continue;
             }
-        }
-        for (DailyRunnable runnable : new ArrayList<>(asynchronouslyDaily)) {
-            if (runnable.getName().equals(name) && runnable.getPlugin().equals(plugin)) {
-                asynchronouslyDaily.remove(runnable);
-                flag = true;
+            if (!task.getName().equals(name)) {
+                continue;
             }
-        }
-        return flag;
-    }
-
-    /**
-     * 取消该每日线程
-     *
-     * @param runnable 线程实例
-     * @return 是否成功取消
-     */
-    public static boolean cancelDailyRunnable(Runnable runnable) {
-        boolean flag = false;
-        for (DailyRunnable dailyRunnable : new ArrayList<>(daily)) {
-            if (dailyRunnable.getRunnable().equals(runnable)) {
-                daily.remove(dailyRunnable);
-                flag = true;
-            }
-        }
-        for (DailyRunnable dailyRunnable : new ArrayList<>(asynchronouslyDaily)) {
-            if (dailyRunnable.getRunnable().equals(runnable)) {
-                asynchronouslyDaily.remove(dailyRunnable);
-                flag = true;
-            }
+            tasks.remove(i);
+            i--;
+            flag = true;
         }
         return flag;
     }
@@ -770,8 +753,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param name 要获取的玩家
      * @return 玩家的头颅物品
      */
-    @Deprecated
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions", "deprecation"})
     public static ItemStack getPlayerHead(String name) {
         ItemStack stack;
         try {
@@ -1027,7 +1009,7 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 创建SQL连接
+     * 创建MySQL连接
      *
      * @param host     主机地址
      * @param port     主机端口
@@ -1045,7 +1027,7 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     /**
-     * 创建SQL连接
+     * 创建MySQL连接
      *
      * @param host     主机地址
      * @param port     主机端口
@@ -1057,16 +1039,12 @@ public final class HamsterAPI extends JavaPlugin {
      */
     public static Connection getMySQLConnection(String host, String port, String user, String password, String database) throws SQLException {
         Connection connection = getMySQLConnection(host, port, user, password);
-
-        Statement statement = connection.createStatement();
-        statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
-        statement.execute(String.format("USE %s;", database));
-        statement.close();
+        createDatabase(connection, database);
         return connection;
     }
 
     /**
-     * 创建SQL连接
+     * 创建MySQL连接
      *
      * @param config config对象
      * @return 连接对象
@@ -1080,13 +1058,38 @@ public final class HamsterAPI extends JavaPlugin {
                 config.getString("password")
         );
         if (config.contains("database")) {
-            String database = config.getString("database");
-            Statement statement = connection.createStatement();
-            statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
-            statement.execute(String.format("USE %s;", database));
-            statement.close();
+            createDatabase(connection, config.getString("database"));
         }
         return connection;
+    }
+
+    /**
+     * 创建SQL连接
+     *
+     * @param config config对象
+     * @return 连接对象
+     * @throws SQLException SQL连接异常
+     * @since 2.3.6
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static Connection getSQLConnection(ConfigurationSection config) throws SQLException, ClassNotFoundException {
+        Class.forName(config.getString("driver"));
+        Connection connection = DriverManager.getConnection(
+                config.getString("url"),
+                config.getString("user"),
+                config.getString("password")
+        );
+        if (config.contains("database")) {
+            createDatabase(connection, config.getString("database"));
+        }
+        return connection;
+    }
+
+    private static void createDatabase(Connection connection, String database) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
+        statement.execute(String.format("USE %s;", database));
+        statement.close();
     }
 
     public static void reloadVault() {
@@ -1094,34 +1097,34 @@ public final class HamsterAPI extends JavaPlugin {
         economy = null;
         permission = null;
         if (!HamsterAPI.isSetupVault()) {
-            sendConsoleMessage("§e§l[HamsterAPI] §c未检测到Vault插件!");
+            logUtils.warning("未检测到Vault插件!");
             return;
         }
-        sendConsoleMessage("§e§l[HamsterAPI] §a已连接Vault!");
+        logUtils.info("已连接Vault!");
 
         RegisteredServiceProvider<Chat> chatProvider = Bukkit.getServer().getServicesManager().getRegistration(Chat.class);
 
         if (chatProvider != null) {
             chat = chatProvider.getProvider();
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a聊天系统挂接成功...");
+            logUtils.info("聊天系统挂接成功...");
         } else {
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到聊天插件!");
+            logUtils.warning("未检测到聊天系统!");
         }
 
         RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a经济系统挂接成功...");
+            logUtils.info("经济系统挂接成功...");
         } else {
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到经济插件!");
+            logUtils.warning("未检测到经济系统!");
         }
 
         RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
         if (permissionProvider != null) {
             permission = permissionProvider.getProvider();
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a权限系统挂接成功...");
+            logUtils.info("权限系统挂接成功...");
         } else {
-            HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §c未检测到权限插件!");
+            logUtils.warning("未检测到权限插件!");
         }
     }
 
@@ -1129,23 +1132,31 @@ public final class HamsterAPI extends JavaPlugin {
     @SuppressWarnings("ConstantConditions")
     public void onEnable() {
         instance = this;
+        logUtils = new LogUtils(this);
+        getLogger().info("==============================");
+        getLogger().info("插件正在启动中...");
         ConfigurationSerialization.registerClass(DisplayMessage.class);
-        HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件正在初始化...");
-        dailyThread = new DailyThread();
-        dailyThread.start();
+        getLogger().info("已注册序列化信息...");
+        dailyTaskThread = new DailyTaskThread();
+        dailyTaskThread.start();
+        getLogger().info("已启动每日任务线程...");
         PluginCommand command = getCommand("HamsterAPI");
         HamsterCommand hamsterCommand = new HamsterCommand(command, this);
         command.setExecutor(hamsterCommand);
+        getLogger().info("已注册命令执行器...");
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-
+        getLogger().info("已注册BungeeCord通道...");
         nmsVersion = getNMSVersion();
-
+        getLogger().info("已获取NMS版本: " + nmsVersion);
         if (nmsVersion.equalsIgnoreCase("v1_8_R1") || nmsVersion.startsWith("v1_7_")) {
             useOldMethods = true;
         }
+        getLogger().info("已注册GUI点击事件监听器...");
         Bukkit.getPluginManager().registerEvents(new GuiClickListener(), this);
-        HamsterAPI.sendConsoleMessage("§e§l[HamsterAPI] §a插件已启动!");
+
+        getLogger().info("插件启动完成!");
+        getLogger().info("==============================");
 
         Bukkit.getScheduler().runTask(this, () -> {
             reloadVault();
@@ -1160,60 +1171,8 @@ public final class HamsterAPI extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (dailyThread != null) {
-            dailyThread.close();
+        if (dailyTaskThread != null && !dailyTaskThread.isStop()) {
+            dailyTaskThread.setStop(true);
         }
     }
-
-    private final static class DailyThread extends Thread {
-        private final long time;
-        private boolean stop;
-
-        private DailyThread() {
-            Calendar now = Calendar.getInstance();
-            Calendar nextTime = Calendar.getInstance();
-            nextTime.set(Calendar.MILLISECOND, 0);
-            nextTime.set(Calendar.SECOND, 0);
-            nextTime.set(Calendar.MINUTE, 0);
-            nextTime.set(Calendar.HOUR_OF_DAY, 24);
-            time = nextTime.getTime().getTime() - now.getTime().getTime();
-        }
-
-        @Override
-        @SuppressWarnings("BusyWait")
-        public void run() {
-            if (stop) return;
-
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            while (true) {
-                if (stop) return;
-
-                Bukkit.getScheduler().runTask(instance, () -> {
-                    for (DailyRunnable runnable : asynchronouslyDaily) {
-                        runnable.run();
-                    }
-                });
-
-                for (DailyRunnable runnable : new ArrayList<>(daily)) {
-                    runnable.run();
-                }
-
-                try {
-                    Thread.sleep(86400000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private void close() {
-            this.stop = true;
-        }
-    }
-
 }

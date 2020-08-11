@@ -1,4 +1,5 @@
 debug: false
+
 messages:
   ==: DisplayMessage
   sound: ENDERDRAGON_GROWL
