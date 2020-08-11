@@ -1133,30 +1133,35 @@ public final class HamsterAPI extends JavaPlugin {
     public void onEnable() {
         instance = this;
         logUtils = new LogUtils(this);
-        getLogger().info("==============================");
-        getLogger().info("插件正在启动中...");
+        logUtils.info("==============================");
+        logUtils.info("插件正在启动中...");
+
         ConfigurationSerialization.registerClass(DisplayMessage.class);
-        getLogger().info("已注册序列化信息...");
+        logUtils.info("已注册序列化信息...");
+
         dailyTaskThread = new DailyTaskThread();
         dailyTaskThread.start();
-        getLogger().info("已启动每日任务线程...");
+        logUtils.info("已启动每日任务线程...");
+
         PluginCommand command = getCommand("HamsterAPI");
         HamsterCommand hamsterCommand = new HamsterCommand(command, this);
         command.setExecutor(hamsterCommand);
-        getLogger().info("已注册命令执行器...");
+        logUtils.info("已注册命令执行器...");
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getLogger().info("已注册BungeeCord通道...");
+        logUtils.info("已注册BungeeCord通道...");
+
         nmsVersion = getNMSVersion();
-        getLogger().info("已获取NMS版本: " + nmsVersion);
         if (nmsVersion.equalsIgnoreCase("v1_8_R1") || nmsVersion.startsWith("v1_7_")) {
             useOldMethods = true;
         }
-        getLogger().info("已注册GUI点击事件监听器...");
-        Bukkit.getPluginManager().registerEvents(new GuiClickListener(), this);
+        logUtils.info("已获取NMS版本: " + nmsVersion);
 
-        getLogger().info("插件启动完成!");
-        getLogger().info("==============================");
+        Bukkit.getPluginManager().registerEvents(new GuiClickListener(), this);
+        logUtils.info("已注册GUI点击事件监听器...");
+
+        logUtils.info("插件启动完成!");
+        logUtils.info("==============================");
 
         Bukkit.getScheduler().runTask(this, () -> {
             reloadVault();
