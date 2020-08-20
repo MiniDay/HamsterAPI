@@ -19,17 +19,16 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("unused")
 public class LogUtils extends Formatter {
-    private static final SimpleDateFormat LOG_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH-mm-ss");
+    private static final SimpleDateFormat LOG_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final Logger logger;
 
     public LogUtils(Plugin plugin) {
-        if (plugin == null) {
-            throw new IllegalArgumentException("plugin 不能为null!");
-        }
+        this(plugin.getLogger(), new File(plugin.getDataFolder(), "logs"));
+    }
 
-        this.logger = plugin.getLogger();
-        File logFolder = new File(plugin.getDataFolder(), "logs");
+    public LogUtils(Logger logger, File logFolder) {
+        this.logger = logger;
         if (logFolder.mkdirs()) {
             info("创建日志存档文件夹...");
         }
@@ -50,6 +49,7 @@ public class LogUtils extends Formatter {
             handler.setFormatter(this);
             logger.addHandler(handler);
         } catch (IOException e) {
+            warning("初始化日志文件输出管道时发生了一个异常: ");
             e.printStackTrace();
         }
 
@@ -104,5 +104,9 @@ public class LogUtils extends Formatter {
                 record.getLevel().getName(),
                 record.getMillis()
         );
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 }
