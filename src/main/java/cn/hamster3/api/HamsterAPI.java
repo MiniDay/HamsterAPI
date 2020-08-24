@@ -1129,12 +1129,11 @@ public final class HamsterAPI extends JavaPlugin {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public void onEnable() {
+    public void onLoad() {
         instance = this;
         logUtils = new LogUtils(this);
-        logUtils.info("==============================");
-        logUtils.info("插件正在启动中...");
+        logUtils.infoDividingLine();
+        logUtils.info("插件正在初始化中...");
 
         ConfigurationSerialization.registerClass(DisplayMessage.class);
         logUtils.info("已注册序列化信息...");
@@ -1142,11 +1141,6 @@ public final class HamsterAPI extends JavaPlugin {
         dailyTaskThread = new DailyTaskThread();
         dailyTaskThread.start();
         logUtils.info("已启动每日任务线程...");
-
-        PluginCommand command = getCommand("HamsterAPI");
-        HamsterCommand hamsterCommand = new HamsterCommand(command, this);
-        command.setExecutor(hamsterCommand);
-        logUtils.info("已注册命令执行器...");
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         logUtils.info("已注册BungeeCord通道...");
@@ -1157,27 +1151,52 @@ public final class HamsterAPI extends JavaPlugin {
         }
         logUtils.info("已获取NMS版本: " + nmsVersion);
 
+
+        logUtils.info("插件初始化完成!");
+        logUtils.infoDividingLine();
+    }
+
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public void onEnable() {
+        logUtils.infoDividingLine();
+
+        PluginCommand command = getCommand("HamsterAPI");
+        HamsterCommand hamsterCommand = new HamsterCommand(command, this);
+        command.setExecutor(hamsterCommand);
+        logUtils.info("已注册命令执行器...");
+
         Bukkit.getPluginManager().registerEvents(new GuiClickListener(), this);
         logUtils.info("已注册GUI点击事件监听器...");
 
-        logUtils.info("插件启动完成!");
-        logUtils.info("==============================");
-
         Bukkit.getScheduler().runTask(this, () -> {
+            logUtils.infoDividingLine();
             reloadVault();
             if (isSetupPlayerPoints()) {
                 Plugin plugin = Bukkit.getPluginManager().getPlugin("PlayerPoints");
+                logUtils.info("检测到 PlayerPoints 插件已启动...");
                 if (plugin instanceof PlayerPoints) {
                     playerPointsAPI = ((PlayerPoints) plugin).getAPI();
+                    logUtils.info("PlayerPoints 挂接成功...");
                 }
+            } else {
+                logUtils.warning("未找到 PlayerPoints 前置!");
             }
+            logUtils.infoDividingLine();
         });
+
+        logUtils.infoDividingLine();
     }
 
     @Override
     public void onDisable() {
+        logUtils.infoDividingLine();
+        logUtils.info("插件正在关闭中...");
         if (dailyTaskThread != null && !dailyTaskThread.isStop()) {
             dailyTaskThread.setStop(true);
         }
+        logUtils.info("插件成功关闭!");
+        logUtils.infoDividingLine();
+        logUtils.close();
     }
 }

@@ -22,6 +22,7 @@ public class LogUtils extends Formatter {
     private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH-mm-ss");
     private static final SimpleDateFormat LOG_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final Logger logger;
+    private FileHandler handler;
 
     public LogUtils(Plugin plugin) {
         this(plugin.getLogger(), new File(plugin.getDataFolder(), "logs"));
@@ -29,6 +30,8 @@ public class LogUtils extends Formatter {
 
     public LogUtils(Logger logger, File logFolder) {
         this.logger = logger;
+
+        infoDividingLine();
         if (logFolder.mkdirs()) {
             info("创建日志存档文件夹...");
         }
@@ -44,7 +47,7 @@ public class LogUtils extends Formatter {
         info("创建日志存储文件: " + file.getName());
 
         try {
-            FileHandler handler = new FileHandler(file.getAbsolutePath(), false);
+            handler = new FileHandler(file.getAbsolutePath(), false);
             handler.setEncoding("UTF-8");
             handler.setFormatter(this);
             logger.addHandler(handler);
@@ -54,6 +57,16 @@ public class LogUtils extends Formatter {
         }
 
         info("已初始化日志记录器...");
+    }
+
+    /**
+     * 输出一行分隔线<p>
+     * 除此之外并没有什么卵用
+     *
+     * @since 2.3.7
+     */
+    public void infoDividingLine() {
+        info("==================================================");
     }
 
     public void info(String info) {
@@ -96,17 +109,33 @@ public class LogUtils extends Formatter {
         }
     }
 
+    /**
+     * 关闭日志输出的文件锁<p>
+     * 这个方法应该在每一个插件的onDisable中调用一次<p>
+     * 否则.log.lck文件将不会被删除，直到服务器被/stop命令关闭为止<p>
+     * 这样将会导致/reload 后logs文件夹内出现多个.log.lck文件
+     *
+     * @since 2.3.7
+     */
+    public void close() {
+        handler.close();
+    }
+
     @Override
     public String format(LogRecord record) {
         return String.format(
                 "[%s] [%s] %s\n",
                 LOG_FORMAT.format(new Date(record.getMillis())),
                 record.getLevel().getName(),
-                record.getMillis()
+                record.getMessage()
         );
     }
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public FileHandler getHandler() {
+        return handler;
     }
 }
