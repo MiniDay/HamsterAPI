@@ -64,11 +64,13 @@
             <url>https://jitpack.io</url>
         </repository>
 
+        <!--ProtocolLib的仓库-->
         <repository>
             <id>dmulloy2-repo</id>
             <url>http://repo.dmulloy2.net/nexus/repository/public/</url>
         </repository>
 
+        <!--PlayerPoints的仓库-->
         <repository>
             <id>dakani</id>
             <name>Dakani Nexus Repo</name>
