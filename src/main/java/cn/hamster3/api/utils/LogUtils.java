@@ -77,12 +77,6 @@ public class LogUtils extends Formatter {
         logger.info(String.format(info, params));
     }
 
-    public void info(String... infos) {
-        for (String info : infos) {
-            info(info);
-        }
-    }
-
     public void info(Collection<String> infos) {
         for (String info : infos) {
             info(info);
@@ -95,12 +89,6 @@ public class LogUtils extends Formatter {
 
     public void warning(String warning, Object... params) {
         logger.warning(String.format(warning, params));
-    }
-
-    public void warning(String... warnings) {
-        for (String warning : warnings) {
-            warning(warning);
-        }
     }
 
     public void warning(Collection<String> warnings) {
