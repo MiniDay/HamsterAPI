@@ -6,7 +6,7 @@
 
     <groupId>cn.hamster3</groupId>
     <artifactId>HamsterAPI</artifactId>
-    <version>2.3.9-SNAPSHOT</version>
+    <version>2.3.10-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>HamsterAPI</name>
@@ -73,7 +73,6 @@
         <!--PlayerPoints的仓库-->
         <repository>
             <id>dakani</id>
-            <name>Dakani Nexus Repo</name>
             <url>https://repo.dakanilabs.com/repository/maven-public/</url>
         </repository>
     </repositories>

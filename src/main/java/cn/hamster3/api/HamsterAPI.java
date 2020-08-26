@@ -44,7 +44,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public final class HamsterAPI extends JavaPlugin {
     private static final Calculator calculator = new Calculator();
     private static HamsterAPI instance;
@@ -1131,7 +1131,7 @@ public final class HamsterAPI extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
-        logUtils = new LogUtils(this);
+        logUtils = new LogUtils(this, false);
         logUtils.infoDividingLine();
         logUtils.info("插件正在初始化中...");
 

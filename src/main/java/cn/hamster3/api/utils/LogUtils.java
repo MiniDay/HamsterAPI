@@ -19,7 +19,7 @@ import java.util.logging.*;
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class LogUtils extends Formatter {
     private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH-mm-ss");
-    private static final SimpleDateFormat LOG_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat LOG_FILE_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private final Logger logger;
     private StreamHandler handler;
@@ -27,18 +27,43 @@ public class LogUtils extends Formatter {
     private PrintStream printStream;
 
     public LogUtils(Plugin plugin) {
-        this(plugin.getLogger(), new File(plugin.getDataFolder(), "logs"));
+        this(plugin, true);
+    }
+
+    public LogUtils(Plugin plugin, boolean saveToFile) {
+        this.logger = plugin.getLogger();
+        if (saveToFile) {
+            info("已启用日志文件记录器...");
+            initLogFile(new File(plugin.getDataFolder(), "logs"));
+        } else {
+            info("未启用日志文件记录器...");
+        }
+    }
+
+    public LogUtils(Logger logger) {
+        this.logger = logger;
+
+        infoDividingLine();
+        info("初始化日志记录器完成!");
+        infoDividingLine();
     }
 
     public LogUtils(Logger logger, File logFolder) {
         this.logger = logger;
 
+        initLogFile(logFolder);
+
         infoDividingLine();
+        info("初始化日志记录器完成!");
+        infoDividingLine();
+    }
+
+    private void initLogFile(File logFolder) {
         if (logFolder.mkdirs()) {
             info("创建日志存档文件夹...");
         }
 
-        String time = LOG_NAME_FORMAT.format(new Date());
+        String time = LOG_FILE_NAME_FORMAT.format(new Date());
         int i = 1;
         File file = new File(logFolder, time + "-" + i + ".log");
         while (file.exists()) {
@@ -53,12 +78,11 @@ public class LogUtils extends Formatter {
             handler = new StreamHandler(outputStream, this);
             handler.setEncoding("UTF-8");
             logger.addHandler(handler);
+            info("日志输出文件设置完成!");
         } catch (IOException e) {
-            warning("初始化日志文件输出管道时发生了一个异常: ");
+            warning("初始化日志输出文件时发生了一个异常: ");
             e.printStackTrace();
         }
-
-        info("已初始化日志记录器...");
     }
 
     /**
@@ -108,7 +132,9 @@ public class LogUtils extends Formatter {
      * @since 2.3.9
      */
     public void error(Exception e) {
-        e.printStackTrace(printStream);
+        if (printStream != null) {
+            e.printStackTrace(printStream);
+        }
         e.printStackTrace();
     }
 
