@@ -3,26 +3,28 @@ package cn.hamster3.api.utils;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * 日志记录器
  *
  * @since 2.3.6
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public class LogUtils extends Formatter {
     private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH-mm-ss");
     private static final SimpleDateFormat LOG_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     private final Logger logger;
-    private FileHandler handler;
+    private StreamHandler handler;
+    private FileOutputStream outputStream;
+    private PrintStream printStream;
 
     public LogUtils(Plugin plugin) {
         this(plugin.getLogger(), new File(plugin.getDataFolder(), "logs"));
@@ -45,11 +47,11 @@ public class LogUtils extends Formatter {
         }
 
         info("创建日志存储文件: " + file.getName());
-
         try {
-            handler = new FileHandler(file.getAbsolutePath(), false);
+            outputStream = new FileOutputStream(file, false);
+            printStream = new PrintStream(outputStream, true, "UTF-8");
+            handler = new StreamHandler(outputStream, this);
             handler.setEncoding("UTF-8");
-            handler.setFormatter(this);
             logger.addHandler(handler);
         } catch (IOException e) {
             warning("初始化日志文件输出管道时发生了一个异常: ");
@@ -61,7 +63,8 @@ public class LogUtils extends Formatter {
 
     /**
      * 输出一行分隔线<p>
-     * 除此之外并没有什么卵用
+     * 除此之外并没有什么卵用<p>
+     * 只是为了统一分隔线的长度而已（50字符
      *
      * @since 2.3.7
      */
@@ -98,10 +101,32 @@ public class LogUtils extends Formatter {
     }
 
     /**
+     * 向日志文件中输出一条异常记录<p>
+     * 同时也会在控制台打印这条记录
+     *
+     * @param e 异常
+     * @since 2.3.9
+     */
+    public void error(Exception e) {
+        e.printStackTrace(printStream);
+        e.printStackTrace();
+    }
+
+    public void error(String message, Exception e) {
+        warning(message);
+        error(e);
+    }
+
+    public void error(String message, Exception e, Object... args) {
+        warning(message, args);
+        error(e);
+    }
+
+    /**
      * 关闭日志输出的文件锁<p>
      * 这个方法应该在每一个插件的onDisable中调用一次<p>
-     * 否则.log.lck文件将不会被删除，直到服务器被/stop命令关闭为止<p>
-     * 这样将会导致/reload 后logs文件夹内出现多个.log.lck文件
+     * 否则.log文件将会一直被占用而无法删除<p>
+     * 直到服务器被/stop命令关闭为止
      *
      * @since 2.3.7
      */
@@ -123,7 +148,27 @@ public class LogUtils extends Formatter {
         return logger;
     }
 
-    public FileHandler getHandler() {
+    public Handler getHandler() {
         return handler;
+    }
+
+    /**
+     * 获取日志文件输出流
+     *
+     * @return 日志文件输出流对象
+     * @since 2.3.9
+     */
+    public FileOutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    /**
+     * 获取日志文件打印流
+     *
+     * @return 获取日志文件打印流对象
+     * @since 2.3.9
+     */
+    public PrintStream getPrintStream() {
+        return printStream;
     }
 }
