@@ -18,7 +18,7 @@ import java.util.logging.*;
  */
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class LogUtils extends Formatter {
-    private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH-mm-ss");
+    private static final SimpleDateFormat LOG_FORMAT = new SimpleDateFormat("HH:mm:ss");
     private static final SimpleDateFormat LOG_FILE_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private final Logger logger;
@@ -93,35 +93,25 @@ public class LogUtils extends Formatter {
      * @since 2.3.7
      */
     public void infoDividingLine() {
-        info("==================================================");
+        logger.info("==================================================");
     }
 
     public void info(String info) {
         logger.info(info);
+        flush();
     }
 
     public void info(String info, Object... params) {
         logger.info(String.format(info, params));
     }
 
-    public void info(Collection<String> infos) {
-        for (String info : infos) {
-            info(info);
-        }
-    }
-
     public void warning(String warning) {
         logger.warning(warning);
+        flush();
     }
 
     public void warning(String warning, Object... params) {
         logger.warning(String.format(warning, params));
-    }
-
-    public void warning(Collection<String> warnings) {
-        for (String warning : warnings) {
-            warning(warning);
-        }
     }
 
     /**
@@ -136,6 +126,7 @@ public class LogUtils extends Formatter {
             e.printStackTrace(printStream);
         }
         e.printStackTrace();
+        flush();
     }
 
     public void error(String message, Exception e) {
@@ -148,6 +139,12 @@ public class LogUtils extends Formatter {
         error(e);
     }
 
+    public void flush() {
+        if (handler != null) {
+            handler.flush();
+        }
+    }
+
     /**
      * 关闭日志输出的文件锁<p>
      * 这个方法应该在每一个插件的onDisable中调用一次<p>
@@ -157,7 +154,9 @@ public class LogUtils extends Formatter {
      * @since 2.3.7
      */
     public void close() {
-        handler.close();
+        if (handler != null) {
+            handler.close();
+        }
     }
 
     @Override
