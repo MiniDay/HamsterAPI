@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.logging.*;
 
@@ -103,6 +102,7 @@ public class LogUtils extends Formatter {
 
     public void info(String info, Object... params) {
         logger.info(String.format(info, params));
+        flush();
     }
 
     public void warning(String warning) {
@@ -112,6 +112,7 @@ public class LogUtils extends Formatter {
 
     public void warning(String warning, Object... params) {
         logger.warning(String.format(warning, params));
+        flush();
     }
 
     /**
@@ -124,17 +125,17 @@ public class LogUtils extends Formatter {
     public void error(Exception e) {
         if (printStream != null) {
             e.printStackTrace(printStream);
+            flush();
         }
         e.printStackTrace();
-        flush();
     }
 
-    public void error(String message, Exception e) {
+    public void error(Exception e, String message) {
         warning(message);
         error(e);
     }
 
-    public void error(String message, Exception e, Object... args) {
+    public void error(Exception e, String message, Object... args) {
         warning(message, args);
         error(e);
     }

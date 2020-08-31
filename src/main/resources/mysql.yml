@@ -4,5 +4,4 @@ mysql:
   port: 3306
   user: Test
   password: Test123..
-  # 不写database则请自己指配数据库
   database: Test

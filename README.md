@@ -17,7 +17,7 @@
     <dependency>
         <groupId>cn.hamster3</groupId>
         <artifactId>HamsterAPI</artifactId>
-        <version>2.3.10-SNAPSHOT</version>
+        <version>2.3.11-SNAPSHOT</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
@@ -32,7 +32,7 @@
 ```
 ```gradle
 	dependencies {
-	        compileOnly 'cn.hamster3:HamsterAPI:2.3.10-SNAPSHOT'
+	        compileOnly 'cn.hamster3:HamsterAPI:2.3.11-SNAPSHOT'
 	}
 ```
 

@@ -5,15 +5,15 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
-@SuppressWarnings({"ConstantConditions", "unused"})
+@SuppressWarnings({"unused", "ConstantConditions", "RedundantSuppression"})
 public class BlockLocationMatcher {
     private final String worldName;
-    private int x;
-    private int y;
-    private int z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     private final World world;
-    private Location location;
+    private final Location location;
 
     public BlockLocationMatcher(Location location) {
         world = location.getWorld();
@@ -22,13 +22,14 @@ public class BlockLocationMatcher {
         z = location.getBlockZ();
 
         worldName = world.getName();
+        this.location = location;
     }
 
     public BlockLocationMatcher(ConfigurationSection config) {
         worldName = config.getString("worldName");
         x = config.getInt("x");
-        x = config.getInt("x");
-        x = config.getInt("x");
+        y = config.getInt("y");
+        z = config.getInt("z");
 
         world = Bukkit.getWorld(worldName);
         location = new Location(world, x, y, z);
