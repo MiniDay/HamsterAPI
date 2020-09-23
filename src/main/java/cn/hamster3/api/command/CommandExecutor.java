@@ -6,7 +6,7 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public abstract class CommandExecutor implements TabExecutor {
     private final String name;
     private final String description;
@@ -40,6 +40,9 @@ public abstract class CommandExecutor implements TabExecutor {
 
     public boolean checkPermission(CommandSender sender) {
         if (permission == null) {
+            return true;
+        }
+        if (sender.isOp()) {
             return true;
         }
         return sender.hasPermission(permission);
