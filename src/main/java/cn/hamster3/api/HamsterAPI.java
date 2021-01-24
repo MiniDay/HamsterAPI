@@ -44,7 +44,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-@SuppressWarnings({"unused", "RedundantSuppression"})
+@SuppressWarnings({"unused", "RedundantSuppression", "deprecation"})
 public final class HamsterAPI extends JavaPlugin {
     private static final Calculator calculator = new Calculator();
     private static HamsterAPI instance;
@@ -1068,7 +1068,8 @@ public final class HamsterAPI extends JavaPlugin {
      *
      * @param config config对象
      * @return 连接对象
-     * @throws SQLException SQL连接异常
+     * @throws SQLException           SQL连接异常
+     * @throws ClassNotFoundException 找不到数据库驱动
      * @since 2.3.6
      */
     @SuppressWarnings("ConstantConditions")
