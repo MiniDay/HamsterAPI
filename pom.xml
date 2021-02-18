@@ -100,7 +100,7 @@
     <distributionManagement>
         <repository>
             <id>hamster-repo</id>
-            <url>http://maven.hamster3.cn/repository/hamster-repo/</url>
+            <url>http://maven.hamster3.cn/repository/miniday-repo/</url>
         </repository>
     </distributionManagement>
 
