@@ -2,6 +2,7 @@ package cn.hamster3.api.gui.handler;
 
 import cn.hamster3.api.gui.Gui;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -33,11 +34,20 @@ public abstract class Handler implements InventoryHolder {
     }
 
     /**
-     * 当这个Handler所属的Inventory被点击时发生
+     * 当这个 Handler 所属的 Inventory 被点击时发生
      *
-     * @param event Inventory点击事件
+     * @param event 事件
      */
     public void click(InventoryClickEvent event) {
+    }
+
+    /**
+     * 当这个 Handler 所属的 Inventory 被点击时发生
+     *
+     * @param event 事件
+     */
+    public void drag(InventoryDragEvent event) {
+        event.setCancelled(true);
     }
 
     //todo 窗口按钮初始化

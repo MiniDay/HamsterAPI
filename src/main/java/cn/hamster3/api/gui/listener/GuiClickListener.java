@@ -4,6 +4,7 @@ import cn.hamster3.api.gui.handler.Handler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 public class GuiClickListener implements Listener {
@@ -18,5 +19,15 @@ public class GuiClickListener implements Listener {
         }
         Handler handler = (Handler) inventory.getHolder();
         handler.click(event);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        Inventory inventory = event.getInventory();
+        if (!(inventory.getHolder() instanceof Handler)) {
+            return;
+        }
+        Handler handler = (Handler) inventory.getHolder();
+        handler.drag(event);
     }
 }
