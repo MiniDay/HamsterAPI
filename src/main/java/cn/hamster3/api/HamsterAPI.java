@@ -7,6 +7,8 @@ import cn.hamster3.api.runnable.DailyTask;
 import cn.hamster3.api.runnable.DailyTaskThread;
 import cn.hamster3.api.utils.Calculator;
 import cn.hamster3.api.utils.LogUtils;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import net.md_5.bungee.api.chat.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -19,6 +21,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -33,8 +36,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -1086,6 +1091,15 @@ public final class HamsterAPI extends JavaPlugin {
         return connection;
     }
 
+    public static DataSource getSQLDataSource(final ConfigurationSection config) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(config.getString("url"));
+        hikariConfig.setUsername(config.getString("user"));
+        hikariConfig.setPassword(config.getString("password"));
+        hikariConfig.setDriverClassName(config.getString("driver"));
+        return new HikariDataSource(hikariConfig);
+    }
+
     private static void createDatabase(Connection connection, String database) throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET ='UTF8';", database));
@@ -1131,8 +1145,13 @@ public final class HamsterAPI extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        final File defaultLogSettingsFile = new File(this.getDataFolder(), "defaultLogSettings.yml");
+        if (!defaultLogSettingsFile.exists()) {
+            this.saveResource("defaultLogSettings.yml", true);
+        }
+        LogUtils.DEFAULT_CONFIG = YamlConfiguration.loadConfiguration(defaultLogSettingsFile);
         instance = this;
-        logUtils = new LogUtils(this, false);
+        logUtils = new LogUtils(this);
         logUtils.infoDividingLine();
         logUtils.info("插件正在初始化中...");
 
