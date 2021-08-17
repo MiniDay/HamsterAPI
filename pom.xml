@@ -92,15 +92,15 @@
 
     <repositories>
         <repository>
-            <id>hamster3</id>
-            <url>https://maven.airgame.net/hamster-repo/</url>
+            <id>airgame-public</id>
+            <url>https://maven.airgame.net/repository/maven-public/</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>hamster-repo</id>
-            <url>https://maven.airgame.net/hamster-repo/</url>
+            <id>airgame-snapshots</id>
+            <url>https://maven.airgame.net/repository/maven-snapshots/</url>
         </repository>
     </distributionManagement>
 
