@@ -41,6 +41,9 @@ public abstract class Handler implements InventoryHolder {
     public void click(InventoryClickEvent event) {
     }
 
+    public void clickBottom(InventoryClickEvent event) {
+    }
+
     /**
      * 当这个 Handler 所属的 Inventory 被点击时发生
      *
