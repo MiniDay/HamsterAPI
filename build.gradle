@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
+group = "cn.hamster3"
 version = "2.4.5-SNAPSHOT"
 
 repositories {
