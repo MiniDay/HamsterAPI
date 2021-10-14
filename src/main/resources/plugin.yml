@@ -1,5 +1,5 @@
 name: HamsterAPI
-version: ${project.version}
+version: ${version}
 main: cn.hamster3.api.HamsterAPI
 authors: [Hamster3]
 description: 一个方便开发者使用的API

@@ -7,6 +7,9 @@ import cn.hamster3.api.runnable.DailyTask;
 import cn.hamster3.api.runnable.DailyTaskThread;
 import cn.hamster3.api.utils.Calculator;
 import cn.hamster3.api.utils.LogUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import net.md_5.bungee.api.chat.*;
@@ -51,11 +54,23 @@ import java.util.*;
 
 @SuppressWarnings({"unused", "RedundantSuppression", "deprecation"})
 public final class HamsterAPI extends JavaPlugin {
+    /**
+     * @since 2.4.5
+     */
+    public static final Gson GSON = new GsonBuilder().create();
+    /**
+     * @since 2.4.5
+     */
+    public static final JsonParser JSON_PARSER = new JsonParser();
+
     private static final Calculator calculator = new Calculator();
+
     private static HamsterAPI instance;
+
     private static Chat chat;
     private static Economy economy;
     private static Permission permission;
+
     private static PlayerPointsAPI playerPointsAPI;
 
     private static DailyTaskThread dailyTaskThread;
@@ -1091,6 +1106,12 @@ public final class HamsterAPI extends JavaPlugin {
         return connection;
     }
 
+    /**
+     * 创建 SQL 连接池
+     *
+     * @param config SQL 配置
+     * @return SQL 连接池
+     */
     public static DataSource getSQLDataSource(final ConfigurationSection config) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.getString("url"));

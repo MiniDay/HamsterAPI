@@ -1,7 +1,0 @@
-# sql示例配置文件
-datasource:
-  driver: "com.mysql.cj.jdbc.Driver"
-  url: "jdbc:mysql://test3.hamster3.cn:3306?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false"
-  user: Test
-  password: Test123..
-  database: Test

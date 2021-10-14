@@ -1,0 +1,109 @@
+//file:noinspection GroovyAssignabilityCheck
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+version = "2.4.5-SNAPSHOT"
+
+repositories {
+    maven {
+        url = "https://maven.airgame.net/repository/maven-public/"
+    }
+}
+
+configurations {
+    apiShade
+    api.extendsFrom apiShade
+    implementationShade
+    implementation.extendsFrom implementationShade
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    apiShade group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    implementationShade 'mysql:mysql-connector-java:8.0.25'
+
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    compileOnly group: 'org.jetbrains', name: 'annotations', version: '21.0.1'
+
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+    compileOnly 'me.clip:placeholderapi:2.10.9'
+    compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
+    compileOnly 'org.black_ixx:PlayerPoints:2.1.3'
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("plugin.yml") {
+        expand "version": project.version
+    }
+}
+
+jar {
+    archivesBaseName = "HamsterAPI"
+    from([
+            configurations.apiShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.implementationShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            rootProject.file("LICENSE")
+    ])
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier('sources')
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier('javadoc')
+    from javadoc.destinationDir
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+javadoc {
+    options.quiet()
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.links = [
+            "https://javadoc.io/doc/org.jetbrains/annotations/21.0.1",
+            'https://javadoc.io/doc/com.google.code.gson/gson/2.8.7',
+            'https://ci.dmulloy2.net/job/ProtocolLib/javadoc',
+            'http://milkbowl.github.io/VaultAPI',
+            'https://bukkit.windit.net/javadoc'
+    ]
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://maven.airgame.net/repository/maven-releases/'
+            def snapshotsRepoUrl = 'https://maven.airgame.net/repository/maven-snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username maven_username
+                password maven_password
+            }
+        }
+    }
+}

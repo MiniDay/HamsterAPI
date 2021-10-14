@@ -34,7 +34,7 @@ public class LogUtils {
 
     /**
      * 以默认配置实例化一个日志记录器
-     * 默认的配置在 plugins/AirGame-API/defaultLogSettings.yml 中
+     * 默认的配置在 plugins/Hamster-API/defaultLogSettings.yml 中
      *
      * @param plugin 使用这个日志记录器的插件对象
      */

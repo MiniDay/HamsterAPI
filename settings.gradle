@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'airgame-repo'
+            url = 'https://maven.airgame.net/repository/maven-public/'
+        }
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'HamsterAPI'
