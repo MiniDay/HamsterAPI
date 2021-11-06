@@ -11,3 +11,12 @@ datasource:
   user: Test
   # 密码
   password: Test123..
+  # 最大链接数
+  maximumPoolSize: 3
+  # 最小链接数
+  minimumIdle: 1
+  # 超时回收时间（毫秒）
+  idleTimeout: 300000
+  # 链接最长存活时间（毫秒）
+  # 建议设置为比 MySQL 上的 wait_timeout 参数少 30 秒
+  maxLifetime: 1800000

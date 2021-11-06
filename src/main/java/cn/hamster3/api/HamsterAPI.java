@@ -1112,12 +1112,20 @@ public final class HamsterAPI extends JavaPlugin {
      * @param config SQL 配置
      * @return SQL 连接池
      */
-    public static DataSource getSQLDataSource(final ConfigurationSection config) {
+    public static HikariDataSource getHikariDataSource(final ConfigurationSection config) {
         HikariConfig hikariConfig = new HikariConfig();
+
+        hikariConfig.setDriverClassName(config.getString("driver"));
+
         hikariConfig.setJdbcUrl(config.getString("url"));
         hikariConfig.setUsername(config.getString("user"));
         hikariConfig.setPassword(config.getString("password"));
-        hikariConfig.setDriverClassName(config.getString("driver"));
+
+        hikariConfig.setMaximumPoolSize(config.getInt("maximumPoolSize", 3));
+        hikariConfig.setMinimumIdle(config.getInt("minimumIdle", 1));
+        hikariConfig.setIdleTimeout(config.getLong("idleTimeout", 5 * 60 * 1000));
+        hikariConfig.setMaxLifetime(config.getLong("maxLifetime", 0));
+
         return new HikariDataSource(hikariConfig);
     }
 
