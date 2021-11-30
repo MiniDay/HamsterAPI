@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cn.hamster3"
-version = "2.4.6-SNAPSHOT"
+version = "2.4.7-SNAPSHOT"
 
 repositories {
     maven {
