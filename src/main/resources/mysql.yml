@@ -4,4 +4,4 @@ mysql:
   port: 3306
   user: Test
   password: Test123..
-  database: Test
+  database: Test1
