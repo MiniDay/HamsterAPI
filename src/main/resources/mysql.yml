@@ -1,6 +1,6 @@
 # mysql示例配置文件
 mysql:
-  host: test3.hamster3.cn
+  host: sql.hamster3.cn
   port: 3306
   user: Test
   password: Test123..

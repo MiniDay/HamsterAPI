@@ -6,7 +6,7 @@ datasource:
   # 数据库链接填写格式:
   #   jdbc:mysql://{数据库地址}:{数据库端口}/{使用的库名}?参数
   # 除非你知道自己在做什么，否则不建议更改 {} 以外的内容
-  url: "jdbc:mysql://test3.hamster3.cn:3306/Test1?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false"
+  url: "jdbc:mysql://sql.hamster3.cn:3306/Test1?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false"
   # 用户名
   user: Test
   # 密码
