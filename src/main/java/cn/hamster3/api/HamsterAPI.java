@@ -1112,7 +1112,7 @@ public final class HamsterAPI extends JavaPlugin {
      * @param config SQL 配置
      * @return SQL 连接池
      */
-    public static HikariDataSource getHikariDataSource(final ConfigurationSection config) {
+    public static DataSource getHikariDataSource(final ConfigurationSection config) {
         HikariConfig hikariConfig = new HikariConfig();
 
         hikariConfig.setDriverClassName(config.getString("driver"));

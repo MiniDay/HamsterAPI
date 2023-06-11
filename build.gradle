@@ -1,11 +1,14 @@
 //file:noinspection GroovyAssignabilityCheck
+//file:noinspection VulnerableLibrariesLocal
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7+'
 }
 
 group = "cn.hamster3"
-version = "2.4.7-SNAPSHOT"
+version = "2.4.8-SNAPSHOT"
+archivesBaseName = "HamsterAPI"
 
 repositories {
     maven {
@@ -13,22 +16,14 @@ repositories {
     }
 }
 
-configurations {
-    apiShade
-    api.extendsFrom apiShade
-    implementationShade
-    implementation.extendsFrom implementationShade
-}
-
 dependencies {
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    apiShade group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
-    implementationShade 'mysql:mysql-connector-java:8.0.29'
+    implementation 'com.zaxxer:HikariCP:4.0.3' exclude group: "org.slf4j"
 
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
     compileOnly group: 'org.jetbrains', name: 'annotations', version: '21.0.1'
 
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
 
@@ -44,16 +39,6 @@ processResources {
 }
 
 jar {
-    archivesBaseName = "HamsterAPI"
-    from([
-            configurations.apiShade.collect {
-                it.isDirectory() ? it : zipTree(it)
-            },
-            configurations.implementationShade.collect {
-                it.isDirectory() ? it : zipTree(it)
-            },
-            rootProject.file("LICENSE")
-    ])
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
@@ -64,11 +49,16 @@ java {
     withSourcesJar()
 }
 
-
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:unchecked"
 }
+
+shadowJar {
+    relocate 'com.zaxxer', 'cn.hamster3.api.shadow.com.zaxxer'
+    destinationDir(rootProject.buildDir)
+}
+tasks.build.dependsOn(shadowJar)
 
 javadoc {
     options.quiet()
@@ -85,11 +75,10 @@ javadoc {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact jar
-            artifact sourcesJar
-            artifact javadocJar
+        shadow(MavenPublication) { publication ->
+            {
+                from components.java
+            }
         }
     }
 
